@@ -1,0 +1,17 @@
+{
+  "name": "circuit-js",
+  "version": "0.1.0",
+  "description": "Data binding library",
+  "main": "circuit.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ionstage/circuit.git"
+  },
+  "keywords": [
+    "data binding",
+    "event-driven",
+    "reactive"
+  ],
+  "author": "iOnStage",
+  "license": "MIT"
+}
