@@ -37,7 +37,7 @@
 
     function sendMessage(target, value, type) {
       setTimeout(function() {
-        if (typeof target['in'] === 'function'){
+        if (typeof target['in'] === 'function') {
           if (type === 'prop')
             target['in'](value);
           else
