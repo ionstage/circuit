@@ -80,7 +80,7 @@
       for (var i = 0, len = types.length; i < len; i += 1) {
         var type = types[i];
         var typeObject = {};
-        var baseTypeObject = base ? base[type] : {};
+        var baseTypeObject = (base && type in base) ? base[type] : {};
 
         for (var key in baseTypeObject) {
           var keyObject = {};
