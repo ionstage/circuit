@@ -95,7 +95,10 @@
           keyObject.element = element;
           keyObject.type = type;
           keyObject.targets = [];
-          keyObject.source = null;
+          if (type === 'prop')
+            keyObject.source = null;
+          else if (type === 'event')
+            keyObject.sources = [];
 
           typeObject[key] = keyObject;
         }
@@ -119,13 +122,16 @@
       if (typeof target['in'] !== 'function')
         return false;
 
-      if (target.source !== null)
+      if (source.type === 'prop' && target.source !== null)
         return false;
 
       if (indexOf(source.targets, target) !== -1)
         return false;
 
-      target.source = source;
+      if (source.type === 'prop')
+        target.source = source;
+      else if (source.type === 'event')
+        target.sources.push(source);
 
       source.targets.push(target);
 
@@ -147,14 +153,22 @@
       if (source.type !== target.type)
         return false;
 
-      if (target.source !== source)
+      if (source.type === 'prop' && target.source !== source) {
         return false;
+      } else if (source.type === 'event') {
+        var sourceIndex = indexOf(target.sources, source);
+        if (sourceIndex === -1)
+          return false;
+      }
 
       var targetIndex = indexOf(source.targets, target);
       if (targetIndex === -1)
         return false;
 
-      target.source = null;
+      if (source.type === 'prop')
+        target.source = null;
+      else if (source.type === 'event')
+        target.sources.splice(sourceIndex, 1);
 
       source.targets.splice(targetIndex, 1);
 
