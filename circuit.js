@@ -150,18 +150,13 @@
       if (target.source !== source)
         return false;
 
-      if (indexOf(source.targets, target) === -1)
+      var targetIndex = indexOf(source.targets, target);
+      if (targetIndex === -1)
         return false;
 
       target.source = null;
 
-      var targets = source.targets;
-      for (var i = targets.length - 1; i >= 0; i -= 1) {
-        if (targets[i] === target) {
-          targets.splice(i, 1);
-          break;
-        }
-      }
+      source.targets.splice(targetIndex, 1);
 
       return true;
     }
