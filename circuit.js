@@ -153,22 +153,19 @@
       if (source.type !== target.type)
         return false;
 
-      if (source.type === 'prop' && target.source !== source) {
+      if (source.type === 'prop' && target.source !== source)
         return false;
-      } else if (source.type === 'event') {
-        var sourceIndex = indexOf(target.sources, source);
-        if (sourceIndex === -1)
-          return false;
-      }
 
       var targetIndex = indexOf(source.targets, target);
       if (targetIndex === -1)
         return false;
 
-      if (source.type === 'prop')
+      if (source.type === 'prop') {
         target.source = null;
-      else if (source.type === 'event')
+      } else if (source.type === 'event') {
+        var sourceIndex = indexOf(target.sources, source);
         target.sources.splice(sourceIndex, 1);
+      }
 
       source.targets.splice(targetIndex, 1);
 
