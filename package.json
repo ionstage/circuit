@@ -1,5 +1,5 @@
 {
-  "name": "circuit-js",
+  "name": "circuit",
   "version": "0.1.1",
   "description": "Data binding library",
   "main": "circuit.js",
