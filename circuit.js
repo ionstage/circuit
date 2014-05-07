@@ -57,9 +57,8 @@
 
       var value = source.out();
       var targets = source.targets;
-      for (var i = 0, len = targets.length; i < len; i += 1) {
+      for (var i = 0, len = targets.length; i < len; i += 1)
         sendMessage(targets[i], value, type);
-      }
     }
 
     function updateProperty(key) {
