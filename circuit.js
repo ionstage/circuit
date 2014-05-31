@@ -35,11 +35,11 @@
       return -1;
     }
 
-    function sendMessage(target, value, type) {
+    function sendMessage(target, args, type) {
       setTimeout(function() {
         if (typeof target['in'] === 'function') {
           if (type === 'prop')
-            target['in'](value);
+            target['in'].apply(target, args);
           else
             target['in']();
         }
@@ -55,10 +55,21 @@
       if (typeof source.out !== 'function')
         return;
 
-      var value = source.out();
       var targets = source.targets;
-      for (var i = 0, len = targets.length; i < len; i += 1)
-        sendMessage(targets[i], value, type);
+
+      if (type !== 'prop' || targets.length === 0)
+        source.out();
+
+      for (var ti = 0, tlen = targets.length; ti < tlen; ti += 1) {
+        var target = targets[ti];
+        var args = [];
+        if (type === 'prop') {
+          var sources = target.sources;
+          for (var si = 0, slen = sources.length; si < slen; si += 1)
+            args.push(sources[si].out());
+        }
+        sendMessage(target, args, type);
+      }
     }
 
     function updateProperty(key) {
@@ -94,10 +105,7 @@
           keyObject.element = element;
           keyObject.type = type;
           keyObject.targets = [];
-          if (type === 'prop')
-            keyObject.source = null;
-          else if (type === 'event')
-            keyObject.sources = [];
+          keyObject.sources = [];
 
           typeObject[key] = keyObject;
         }
@@ -121,24 +129,21 @@
       if (typeof target['in'] !== 'function')
         return false;
 
-      if (source.type === 'prop' && target.source !== null)
-        return false;
-
       if (indexOf(source.targets, target) !== -1)
         return false;
 
-      if (source.type === 'prop')
-        target.source = source;
-      else if (source.type === 'event')
-        target.sources.push(source);
-
+      target.sources.push(source);
       source.targets.push(target);
 
       if (source.type === 'prop') {
         setTimeout(function() {
-          if (typeof source.out === 'function' &&
-              typeof target['in'] === 'function')
-            target['in'](source.out());
+          if (typeof target['in'] === 'function') {
+            var sources = target.sources;
+            var args = [];
+            for (var i = 0, len = sources.length; i < len; i += 1)
+              args.push(sources[i].out());
+            target['in'].apply(target, args);
+          }
         }, 0);
       }
 
@@ -152,19 +157,12 @@
       if (source.type !== target.type)
         return false;
 
-      if (source.type === 'prop' && target.source !== source)
-        return false;
-
       var targetIndex = indexOf(source.targets, target);
       if (targetIndex === -1)
         return false;
 
-      if (source.type === 'prop') {
-        target.source = null;
-      } else if (source.type === 'event') {
-        var sourceIndex = indexOf(target.sources, source);
-        target.sources.splice(sourceIndex, 1);
-      }
+      var sourceIndex = indexOf(target.sources, source);
+      target.sources.splice(sourceIndex, 1);
 
       source.targets.splice(targetIndex, 1);
 
