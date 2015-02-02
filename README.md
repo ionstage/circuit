@@ -107,7 +107,7 @@ setTimeout(function() {
 
 ````
 
-##License
+## License
 Copyright &copy; 2014 iOnStage
 Licensed under the [MIT License][mit].
 
