@@ -16,44 +16,47 @@ var circuit = require('./circuit.js');
 
 ````javascript
 var foo = circuit.create({
+  init: function() {
+    var el = this.el; // === foo
+    el.i = 0;
+  },
   prop: {
     i: {
       out: function() {
-        var element = this.element; // === foo
-        return this.element.i;
+        return this.el.i;
       }
     }
   },
   event: {
     countUp: {
       in: function() {
-        var element = this.element;
-        element.i += 1;
-        element.updateProperty('i');
+        this.el.i += 1;
+        this.el.updateProperty('i');
       }
     }
   }
 });
-foo.i = 0;
 
 var bar = circuit.create({
+  init: function() {
+    var el = this.el; // === bar
+    el.x = 0;
+  },
   prop: {
     x: {
       in: function(value) {
-        var element = this.element; // === bar
-        element.x = value;
-        element.updateProperty('x ^ 2');
+        this.el.x = value;
+        this.el.updateProperty('x ^ 2');
       }
     },
     'x ^ 2':  {
       out: function() {
-        var x = this.element.x;
+        var x = this.el.x;
         return x * x;
       }
     }
   }
 });
-bar.x = 0;
 
 var baz = circuit.create({
   prop: {
@@ -69,9 +72,9 @@ var qux = circuit.create({
   event: {
     clock: {
       in: function() {
-        var element = this.element; // === qux
+        var el = this.el; // === qux
         setInterval(function() {
-          element.dispatchEvent('clock');
+          el.dispatchEvent('clock');
         }, 1000);
       },
       out: circuit.noop // empty function
@@ -104,7 +107,6 @@ setTimeout(function() {
     circuit.connect(qux.event.clock, foo.event.countUp);
   }, 5000);
 }, 10000);
-
 ````
 
 ## License
