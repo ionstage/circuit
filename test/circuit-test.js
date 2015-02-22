@@ -59,8 +59,8 @@ describe('.create', function() {
 
   it('cel prop/event has reference of cel', function() {
     var cel = createTestCel(['a'], null, ['b'], null);
-    assert.strictEqual(cel, cel.prop.a.element);
-    assert.strictEqual(cel, cel.event.b.element);
+    assert.strictEqual(cel, cel.prop.a.el);
+    assert.strictEqual(cel, cel.event.b.el);
   });
 
   it('cel prop/event has type', function() {
@@ -217,7 +217,7 @@ describe('.connect', function() {
     var cel2 = createTestCel(['a'], null, null, null);
     cel2.prop.a['in'] = sinon.spy();
     cel1.prop.a['in'] = function() {
-      this.element.updateProperty('a');
+      this.el.updateProperty('a');
       setTimeout(function() {
         assert(cel2.prop.a['in'].calledTwice);
         done();
@@ -257,7 +257,7 @@ describe('.connect', function() {
     var cel2 = createTestCel(null, null, ['a'], null);
     cel2.event.a['in'] = sinon.spy();
     cel1.event.a['in'] = function() {
-      this.element.dispatchEvent('a');
+      this.el.dispatchEvent('a');
       setTimeout(function() {
         assert(cel2.event.a['in'].called);
         done();
