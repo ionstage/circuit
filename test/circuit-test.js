@@ -77,6 +77,15 @@ describe('.create', function() {
     assert.notStrictEqual(baseCel.prop.a, cel.prop.a);
     assert.strictEqual(baseCel.prop.a['in'], cel.prop.a['in']);
   });
+
+  it('initialize cel', function() {
+    var cel = circuit.create({
+      init: function() {
+        this.element.isInitialized = true;
+      }
+    });
+    assert(cel.isInitialized);
+  });
 });
 
 describe('.connect', function() {

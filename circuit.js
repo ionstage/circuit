@@ -113,6 +113,9 @@
         element[type] = typeObject;
       }
 
+      if (base && typeof base.init === 'function')
+        base.init.call({element: element});
+
       return element;
     }
 
