@@ -86,6 +86,16 @@ describe('.create', function() {
     });
     assert(cel.isInitialized);
   });
+
+  it('access element via .el', function() {
+    var cel = createTestCel(['a'], null, null, null);
+    assert.strictEqual(cel.prop.a.element, cel.prop.a.el);
+    circuit.create({
+      init: function() {
+        assert.strictEqual(this.element, this.el);
+      }
+    });
+  });
 });
 
 describe('.connect', function() {

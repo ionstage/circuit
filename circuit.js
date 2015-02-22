@@ -102,7 +102,7 @@
           if (typeof baseOutFunc === 'function')
             keyObject.out = baseOutFunc;
 
-          keyObject.element = element;
+          keyObject.el = keyObject.element = element;
           keyObject.type = type;
           keyObject.targets = [];
           keyObject.sources = [];
@@ -114,7 +114,7 @@
       }
 
       if (base && typeof base.init === 'function')
-        base.init.call({element: element});
+        base.init.call({element: element, el: element});
 
       return element;
     }
