@@ -110,7 +110,7 @@ setTimeout(function() {
 ````
 
 ## License
-Copyright &copy; 2014 iOnStage
+Copyright &copy; 2015 iOnStage
 Licensed under the [MIT License][mit].
 
 [MIT]: http://www.opensource.org/licenses/mit-license.php
