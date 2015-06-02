@@ -7,8 +7,8 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "mocha": "*",
-    "sinon": "*"
+    "mocha": "^2.2.5",
+    "sinon": "^1.14.1"
   },
   "repository": {
     "type": "git",
