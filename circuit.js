@@ -106,19 +106,19 @@
 
   circuit.connect = function(source, target) {
     if (!source || !target)
-      return false;
+      throw new TypeError('Not enough arguments');
 
     if (source.type !== target.type)
-      return false;
+      throw new TypeError('Cannot connect prop and event');
 
     if (typeof source.out !== 'function')
-      return false;
+      throw new TypeError("Source must have 'out' function");
 
     if (typeof target['in'] !== 'function')
-      return false;
+      throw new TypeError("Target must have 'out' function");
 
     if (indexOf(source.targets, target) !== -1)
-      return false;
+      throw new Error('Already connected');
 
     target.sources.push(source);
     source.targets.push(target);
@@ -134,27 +134,22 @@
         }
       }, 0);
     }
-
-    return true;
   };
 
   circuit.disconnect = function(source, target) {
     if (!source || !target)
-      return false;
+      throw new TypeError('Not enough arguments');
 
     if (source.type !== target.type)
-      return false;
+      throw new TypeError('Cannot connect prop and event');
 
     var targetIndex = indexOf(source.targets, target);
     if (targetIndex === -1)
-      return false;
+      throw new Error('Already disconnected');
 
     var sourceIndex = indexOf(target.sources, source);
     target.sources.splice(sourceIndex, 1);
-
     source.targets.splice(targetIndex, 1);
-
-    return true;
   };
 
   circuit.noop = function() {};

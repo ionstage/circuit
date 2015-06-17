@@ -107,7 +107,9 @@ describe('.connect', function() {
       return ret;
     });
     tgtCel.prop.a['in'] = sinon.spy();
-    assert(circuit.connect(srcCel.prop.a, tgtCel.prop.a));
+    assert.doesNotThrow(function() {
+      circuit.connect(srcCel.prop.a, tgtCel.prop.a);
+    });
     setTimeout(function() {
       assert(srcCel.prop.a.out.called);
       assert(tgtCel.prop.a['in'].calledWith(ret));
@@ -120,7 +122,9 @@ describe('.connect', function() {
     var tgtCel = createTestCel(null, null, null, ['a']);
     srcCel.event.a.out = sinon.spy();
     tgtCel.event.a['in'] = sinon.spy();
-    assert(circuit.connect(srcCel.event.a, tgtCel.event.a));
+    assert.doesNotThrow(function() {
+      circuit.connect(srcCel.event.a, tgtCel.event.a);
+    });
     setTimeout(function() {
       assert(!srcCel.event.a.out.called);
       assert(!tgtCel.event.a['in'].called);
@@ -131,18 +135,28 @@ describe('.connect', function() {
   it('differnt type', function() {
     var srcCel = createTestCel(null, ['a'], null, null);
     var tgtCel = createTestCel(null, null, ['a'], null);
-    assert(!circuit.connect(srcCel.prop.a, tgtCel.event.a));
+    assert.throws(function() {
+      circuit.connect(srcCel.prop.a, tgtCel.event.a);
+    });
   });
 
   it('no argument', function() {
-    assert(!circuit.connect());
+    assert.throws(function() {
+      circuit.connect();
+    });
   });
 
   it('only 1 argument', function() {
     var cel = createTestCel(['a'], ['a'], null, null);
-    assert(!circuit.connect(cel.prop.a));
-    assert(!circuit.connect(null, cel.prop.a));
-    assert(!circuit.connect(undefined, cel.prop.a));
+    assert.throws(function() {
+      circuit.connect(cel.prop.a);
+    });
+    assert.throws(function() {
+      circuit.connect(null, cel.prop.a);
+    });
+    assert.throws(function() {
+      circuit.connect(undefined, cel.prop.a);
+    });
   });
 
   it('source prop has targets', function() {
@@ -160,7 +174,9 @@ describe('.connect', function() {
     var srcCel = createTestCel(null, ['a'], null, null);
     var tgtCel = createTestCel(['a'], null, null, null);
     circuit.connect(srcCel.prop.a, tgtCel.prop.a);
-    assert(!circuit.connect(srcCel.prop.a, tgtCel.prop.a));
+    assert.throws(function() {
+      circuit.connect(srcCel.prop.a, tgtCel.prop.a);
+    });
     assert.equal(srcCel.prop.a.targets.length, 1);
   });
 
@@ -179,14 +195,18 @@ describe('.connect', function() {
     var srcCel = createTestCel(null, ['a'], null, null);
     var tgtCel = createTestCel(['a'], null, null, null);
     delete tgtCel.prop.a['in'];
-    assert(!circuit.connect(srcCel.prop.a, tgtCel.prop.a));
+    assert.throws(function() {
+      circuit.connect(srcCel.prop.a, tgtCel.prop.a);
+    });
   });
 
   it('should not connect source which has no out-function', function() {
     var srcCel = createTestCel(null, ['a'], null, null);
     var tgtCel = createTestCel(['a'], null, null, null);
     delete srcCel.prop.a.out;
-    assert(!circuit.connect(srcCel.prop.a, tgtCel.prop.a));
+    assert.throws(function() {
+      circuit.connect(srcCel.prop.a, tgtCel.prop.a);
+    });
   });
 
   it('source event has targets', function() {
@@ -301,14 +321,22 @@ describe('.disconnect', function() {
   });
 
   it('no argument', function() {
-    assert(!circuit.disconnect());
+    assert.throws(function() {
+      circuit.disconnect();
+    });
   });
 
   it('only 1 argument', function() {
     var cel = createTestCel(['a'], ['a'], null, null);
-    assert(!circuit.disconnect(cel.prop.a));
-    assert(!circuit.disconnect(null, cel.prop.a));
-    assert(!circuit.disconnect(undefined, cel.prop.a));
+    assert.throws(function() {
+      circuit.disconnect(cel.prop.a);
+    });
+    assert.throws(function() {
+      circuit.disconnect(null, cel.prop.a);
+    });
+    assert.throws(function() {
+      circuit.disconnect(undefined, cel.prop.a);
+    });
   });
 
   it('source prop has targets', function() {
@@ -328,7 +356,9 @@ describe('.disconnect', function() {
     var tgtCel0 = createTestCel(['a'], null, null, null);
     var tgtCel1 = createTestCel(['a'], null, null, null);
     circuit.connect(srcCel.prop.a, tgtCel0.prop.a);
-    assert(!circuit.disconnect(srcCel.prop.a, tgtCel1.prop.a));
+    assert.throws(function() {
+      circuit.disconnect(srcCel.prop.a, tgtCel1.prop.a);
+    });
   });
 });
 
