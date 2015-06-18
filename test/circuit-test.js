@@ -2,17 +2,12 @@ var assert = require('assert');
 var sinon = require('sinon');
 var circuit = require('../circuit.js');
 
-function forEach(array, fn) {
-  for (var i = 0; i < array.length; i++)
-    fn(array[i], i);
-}
-
 function createTestCelTypeObject(obj, list, key) {
-  if (list == null)
+  if (!list)
     return;
-  forEach(list, function(item) {
+  list.forEach(function(item) {
     obj[item] = obj[item] || {};
-    obj[item][key] = (function() {});
+    obj[item][key] = function() {};
   });
 }
 
