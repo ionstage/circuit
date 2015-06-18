@@ -115,7 +115,7 @@
       throw new TypeError("Source must have 'out' function");
 
     if (typeof target['in'] !== 'function')
-      throw new TypeError("Target must have 'out' function");
+      throw new TypeError("Target must have 'in' function");
 
     if (indexOf(source.targets, target) !== -1)
       throw new Error('Already connected');
