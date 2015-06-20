@@ -363,6 +363,16 @@ describe('.noop', function() {
   });
 });
 
+describe('.prop', function() {
+  it('getter/setter', function() {
+    var o = {};
+    var prop = circuit.prop(null);
+    assert.equal(prop(), null);
+    prop(o);
+    assert.equal(prop(), o);
+  });
+});
+
 describe('element', function() {
   describe('#updateProperty', function() {
     it('prop', function(done) {

@@ -154,6 +154,15 @@
 
   circuit.noop = function() {};
 
+  circuit.prop = function(initialValue) {
+    var cache = initialValue;
+    return function(value) {
+      if (typeof value === 'undefined')
+        return cache;
+      cache = value;
+    };
+  };
+
   if (typeof module !== 'undefined' && module.exports)
     module.exports = circuit;
   else
