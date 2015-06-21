@@ -371,6 +371,11 @@ describe('.prop', function() {
     prop(o);
     assert.equal(prop(), o);
   });
+
+  it('no argument', function() {
+    var prop = circuit.prop();
+    assert(isUndefined(prop()));
+  });
 });
 
 describe('element', function() {
