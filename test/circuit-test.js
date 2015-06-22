@@ -378,6 +378,24 @@ describe('.prop', function() {
   });
 });
 
+describe('.event', function() {
+  it('wrap function', function() {
+    var f = sinon.spy();
+    var o = {
+      f: circuit.event(f)
+    };
+    o.f();
+    assert(f.calledOn(o));
+  });
+
+  it('no argument', function() {
+    var event = circuit.event();
+    assert.doesNotThrow(function() {
+      event();
+    });
+  });
+});
+
 describe('element', function() {
   describe('#updateProperty', function() {
     it('prop', function(done) {

@@ -163,6 +163,13 @@
     };
   };
 
+  circuit.event = function(func) {
+    return function() {
+      if (typeof func === 'function')
+        func.call(this);
+    };
+  };
+
   if (typeof module !== 'undefined' && module.exports)
     module.exports = circuit;
   else
