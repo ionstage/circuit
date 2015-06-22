@@ -156,18 +156,51 @@
 
   circuit.prop = function(initialValue) {
     var cache = initialValue;
-    return function(value) {
+    var targets = [];
+    var func = function(value) {
       if (typeof value === 'undefined')
         return cache;
       cache = value;
+      setTimeout(function() {
+        for (var i = 0, len = targets.length; i < len; i += 1)
+          targets[i](value);
+      }, 0);
     };
+    func.targets = targets;
+    func.type = 'prop';
+    return func;
   };
 
-  circuit.event = function(func) {
-    return function() {
-      if (typeof func === 'function')
-        func.call(this);
+  circuit.event = function(listener) {
+    var targets = [];
+    var func = function() {
+      if (typeof listener === 'function')
+        listener.call(this);
+      setTimeout(function() {
+        for (var i = 0, len = targets.length; i < len; i += 1)
+          targets[i]();
+      }, 0);
     };
+    func.targets = targets;
+    func.type = 'event';
+    return func;
+  };
+
+  circuit.bind = function(source, target) {
+    if (!source || !target)
+      throw new TypeError('Not enough arguments');
+
+    if (source.type !== target.type)
+      throw new TypeError('Cannot bind prop and event');
+
+    source.targets.push(target);
+
+    if (source.type === 'prop') {
+      var sourceValue = source();
+      setTimeout(function() {
+        target(sourceValue);
+      }, 0);
+    }
   };
 
   if (typeof module !== 'undefined' && module.exports)

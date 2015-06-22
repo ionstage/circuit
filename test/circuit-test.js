@@ -396,6 +396,67 @@ describe('.event', function() {
   });
 });
 
+describe('.bind', function() {
+  it('prop', function(done) {
+    var obj0 = {};
+    var a = circuit.prop(obj0);
+    var b = circuit.prop();
+    circuit.bind(a, b);
+    setTimeout(function() {
+      assert.equal(b(), obj0);
+      var obj1 = {};
+      a(obj1);
+      setTimeout(function() {
+        assert.equal(b(), obj1);
+        done();
+      }, 0);
+    }, 0);
+  });
+
+  it('event', function(done) {
+    var funcA = sinon.spy();
+    var funcB = sinon.spy();
+    var a = circuit.event(funcA);
+    var b = circuit.event(funcB);
+    circuit.bind(a, b);
+    setTimeout(function() {
+      assert(!funcA.called);
+      a();
+      setTimeout(function() {
+        assert(funcB.called);
+        done();
+      }, 0);
+    }, 0);
+  });
+
+  it('different type', function() {
+    var a = circuit.prop();
+    var b = circuit.event();
+    assert.throws(function() {
+      circuit.bind(a, b);
+    });
+  });
+
+  it('no argument', function() {
+    assert.throws(function() {
+      circuit.bind();
+    });
+  });
+
+  it('only 1 argument', function() {
+    var a = circuit.prop();
+    assert.throws(function() {
+      circuit.bind(a);
+    });
+    assert.throws(function() {
+      circuit.connect(null, a);
+    });
+    assert.throws(function() {
+      circuit.connect(undefined, a);
+    });
+  });
+});
+
 describe('element', function() {
   describe('#updateProperty', function() {
     it('prop', function(done) {
