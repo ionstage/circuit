@@ -365,11 +365,11 @@ describe('.noop', function() {
 
 describe('.prop', function() {
   it('getter/setter', function() {
-    var o = {};
+    var obj = {};
     var prop = circuit.prop(null);
     assert.equal(prop(), null);
-    prop(o);
-    assert.equal(prop(), o);
+    prop(obj);
+    assert.equal(prop(), obj);
   });
 
   it('no argument', function() {
@@ -380,12 +380,12 @@ describe('.prop', function() {
 
 describe('.event', function() {
   it('wrap function', function() {
-    var f = sinon.spy();
-    var o = {
-      f: circuit.event(f)
+    var func = sinon.spy();
+    var obj = {
+      func: circuit.event(func)
     };
-    o.f();
-    assert(f.calledOn(o));
+    obj.func();
+    assert(func.calledOn(obj));
   });
 
   it('no argument', function() {
