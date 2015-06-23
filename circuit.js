@@ -160,6 +160,8 @@
     var func = function(value) {
       if (typeof value === 'undefined')
         return cache;
+      if (value === cache)
+        return;
       cache = value;
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)

@@ -455,6 +455,21 @@ describe('.bind', function() {
       circuit.connect(undefined, a);
     });
   });
+
+  it('should not update prop when setting same value', function(done) {
+    var obj0 = {};
+    var a = circuit.prop(obj0);
+    var b = sinon.spy();
+    b.type = 'prop';
+    circuit.bind(a, b);
+    setTimeout(function() {
+      a(obj0);
+      setTimeout(function() {
+        assert(b.calledOnce);
+        done();
+      }, 0);
+    }, 0);
+  });
 });
 
 describe('element', function() {
