@@ -376,19 +376,6 @@ describe('.prop', function() {
     var prop = circuit.prop();
     assert(isUndefined(prop()));
   });
-
-  it('callback on update', function(done) {
-    var func = sinon.spy();
-    var obj = {
-      func: circuit.prop(1, func)
-    };
-    obj.func(2);
-    setTimeout(function() {
-      assert(func.calledOn(obj));
-      assert(func.calledWith(2));
-      done();
-    }, 0);
-  });
 });
 
 describe('.event', function() {

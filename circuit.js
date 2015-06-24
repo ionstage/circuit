@@ -154,7 +154,7 @@
 
   circuit.noop = function() {};
 
-  circuit.prop = function(initialValue, callback) {
+  circuit.prop = function(initialValue) {
     var cache = initialValue;
     var targets = [];
     var func = function(value) {
@@ -166,9 +166,7 @@
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)
           targets[i](value);
-        if (typeof callback === 'function')
-          callback.call(this, value);
-      }.bind(this), 0);
+      }, 0);
     };
     func.targets = targets;
     func.type = 'prop';
