@@ -475,13 +475,13 @@ describe('.bind', function() {
   });
 
   it('should not update prop when setting same value', function(done) {
-    var obj0 = {};
-    var a = circuit.prop(obj0);
+    var obj = {};
+    var a = circuit.prop(obj);
     var b = sinon.spy();
     b.type = 'prop';
     circuit.bind(a, b);
     setTimeout(function() {
-      a(obj0);
+      a(obj);
       setTimeout(function() {
         assert(b.calledOnce);
         done();
