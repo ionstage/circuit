@@ -376,6 +376,24 @@ describe('.prop', function() {
     var prop = circuit.prop();
     assert(isUndefined(prop()));
   });
+
+  it('function as argument', function() {
+    var func = sinon.spy();
+    var obj = {
+      func: circuit.prop(func)
+    };
+    obj.func(1);
+    assert(func.calledOn(obj));
+    assert(func.calledWith(1));
+  });
+
+  it('function as argument with cache', function() {
+    var prop = circuit.prop(function(value, cache) {
+      return cache(value);
+    });
+    prop(1);
+    assert.equal(prop(), 1);
+  });
 });
 
 describe('.event', function() {
@@ -466,6 +484,22 @@ describe('.bind', function() {
       a(obj0);
       setTimeout(function() {
         assert(b.calledOnce);
+        done();
+      }, 0);
+    }, 0);
+  });
+
+  it('bind prop with setting function as argument', function(done) {
+    var a = circuit.prop(function(value) {
+      return value;
+    });
+    var b = circuit.prop();
+    circuit.bind(a, b);
+    setTimeout(function() {
+      var obj = {};
+      a(obj);
+      setTimeout(function() {
+        assert.equal(b(), obj);
         done();
       }, 0);
     }, 0);

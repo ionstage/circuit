@@ -18,6 +18,15 @@
     return -1;
   };
 
+  var prop = function(initialValue) {
+    var cache = initialValue;
+    return function(value) {
+      if (typeof value === 'undefined')
+        return cache;
+      cache = value;
+    };
+  };
+
   var sendMessage = function(target, args, type) {
     setTimeout(function() {
       if (typeof target['in'] === 'function') {
@@ -155,19 +164,34 @@
   circuit.noop = function() {};
 
   circuit.prop = function(initialValue) {
-    var cache = initialValue;
     var targets = [];
-    var func = function(value) {
-      if (typeof value === 'undefined')
-        return cache;
-      if (value === cache)
-        return;
-      cache = value;
+    var update = function(value) {
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)
           targets[i](value);
       }, 0);
     };
+    var cache;
+    var func;
+
+    if (typeof initialValue === 'function') {
+      cache = prop();
+      func = function(value) {
+        update(value);
+        return initialValue.call(this, value, cache);
+      };
+    } else {
+      cache = initialValue;
+      func = function(value) {
+        if (typeof value === 'undefined')
+          return cache;
+        if (value === cache)
+          return;
+        update(value);
+        cache = value;
+      };
+    }
+
     func.targets = targets;
     func.type = 'prop';
     return func;
