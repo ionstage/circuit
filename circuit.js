@@ -8,6 +8,11 @@
   'use strict';
   var nativeIndexOf = Array.prototype.indexOf;
 
+  var isObject = function(obj) {
+    var type = typeof obj;
+    return type === 'object' && obj !== null;
+  };
+
   var indexOf = function(array, item) {
     if (nativeIndexOf && array.indexOf === nativeIndexOf)
       return array.indexOf(item);
@@ -185,7 +190,7 @@
       func = function(value) {
         if (typeof value === 'undefined')
           return cache;
-        if (value === cache)
+        if (value === cache && !isObject(value))
           return;
         update(value);
         cache = value;
