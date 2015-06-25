@@ -525,6 +525,19 @@ describe('.bind', function() {
       done();
     }, 0);
   });
+
+  it('bind event with context', function(done) {
+    var func = sinon.spy();
+    var a = circuit.event();
+    var b = circuit.event(func);
+    circuit.bind(a, b);
+    var obj = {};
+    a(obj);
+    setTimeout(function() {
+      assert(func.calledWith(obj));
+      done();
+    }, 0);
+  });
 });
 
 describe('element', function() {

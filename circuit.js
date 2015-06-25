@@ -217,12 +217,14 @@
   circuit.event = function(listener) {
     var targets = [];
     var sources = [];
-    var func = function() {
+    var func = function(context) {
+      if (typeof context === 'undefined')
+        context = {};
       if (typeof listener === 'function')
-        listener();
+        listener(context);
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)
-          targets[i]();
+          targets[i](context);
       }, 0);
     };
     func.targets = targets;
