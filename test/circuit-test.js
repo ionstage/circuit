@@ -386,14 +386,6 @@ describe('.prop', function() {
     assert(func.calledOn(obj));
     assert(func.calledWith(1));
   });
-
-  it('function as argument with cache', function() {
-    var prop = circuit.prop(function(value, cache) {
-      return cache(value);
-    });
-    prop(1);
-    assert.equal(prop(), 1);
-  });
 });
 
 describe('.event', function() {

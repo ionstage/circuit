@@ -176,17 +176,15 @@
           targets[i](value);
       }, 0);
     };
-    var cache;
+    var cache = initialValue;
     var func;
 
     if (typeof initialValue === 'function') {
-      cache = prop();
       func = function(value) {
         update(value);
-        return initialValue.call(this, value, cache);
+        return initialValue.call(this, value);
       };
     } else {
-      cache = initialValue;
       func = function(value) {
         if (typeof value === 'undefined')
           return cache;
