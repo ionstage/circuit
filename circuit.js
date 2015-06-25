@@ -170,38 +170,53 @@
 
   circuit.prop = function(initialValue) {
     var targets = [];
-    var update = function(value) {
+    var sources = [];
+    var update = function() {
       setTimeout(function() {
-        for (var i = 0, len = targets.length; i < len; i += 1)
-          targets[i](value);
+        for (var i = 0, len = targets.length; i < len; i += 1) {
+          var target = targets[i];
+          var sourceValues = target.sources.map(function(source) {
+            return source();
+          });
+          target.apply(null, sourceValues);
+        }
       }, 0);
     };
-    var cache = initialValue;
+    var cache;
     var func;
 
     if (typeof initialValue === 'function') {
-      func = function(value) {
-        update(value);
-        return initialValue.call(this, value);
+      cache = initialValue();
+      func = function() {
+        if (arguments.length === 0)
+          return cache;
+        var value = initialValue.apply(this, arguments);
+        if (value === cache && !isObject(value))
+          return;
+        cache = value;
+        update();
       };
     } else {
+      cache = initialValue;
       func = function(value) {
         if (typeof value === 'undefined')
           return cache;
         if (value === cache && !isObject(value))
           return;
-        update(value);
         cache = value;
+        update();
       };
     }
 
     func.targets = targets;
+    func.sources = sources;
     func.type = 'prop';
     return func;
   };
 
   circuit.event = function(listener) {
     var targets = [];
+    var sources = [];
     var func = function() {
       if (typeof listener === 'function')
         listener.call(this);
@@ -211,6 +226,7 @@
       }, 0);
     };
     func.targets = targets;
+    func.sources = sources;
     func.type = 'event';
     return func;
   };
@@ -223,11 +239,14 @@
       throw new TypeError('Cannot bind prop and event');
 
     source.targets.push(target);
+    target.sources.push(source);
 
     if (source.type === 'prop') {
-      var sourceValue = source();
+      var sourceValues = target.sources.map(function(source) {
+        return source();
+      });
       setTimeout(function() {
-        target(sourceValue);
+        target.apply(null, sourceValues);
       }, 0);
     }
   };

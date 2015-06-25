@@ -470,6 +470,7 @@ describe('.bind', function() {
     var a = circuit.prop(1);
     var b = sinon.spy();
     b.type = 'prop';
+    b.sources = [];
     circuit.bind(a, b);
     setTimeout(function() {
       a(1);
@@ -485,6 +486,7 @@ describe('.bind', function() {
     var a = circuit.prop(obj);
     var b = sinon.spy();
     b.type = 'prop';
+    b.sources = [];
     circuit.bind(a, b);
     setTimeout(function() {
       obj.value = 1;
@@ -509,6 +511,23 @@ describe('.bind', function() {
         assert.equal(b(), obj);
         done();
       }, 0);
+    }, 0);
+  });
+
+  it('bind prop more than once', function(done) {
+    var a = circuit.prop(0);
+    var b = circuit.prop(1);
+    var obj = {
+      prop: sinon.spy()
+    };
+    obj.prop.type = 'prop';
+    obj.prop.sources = [];
+    circuit.bind(a, obj.prop);
+    circuit.bind(b, obj.prop);
+    a(1);
+    setTimeout(function() {
+      assert(obj.prop.thirdCall.calledWith(1, 1));
+      done();
     }, 0);
   });
 });
