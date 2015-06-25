@@ -7,6 +7,7 @@
 (function(global) {
   'use strict';
   var nativeIndexOf = Array.prototype.indexOf;
+  var nativeMap = Array.prototype.map;
 
   var isObject = function(obj) {
     var type = typeof obj;
@@ -21,6 +22,15 @@
         return i;
     }
     return -1;
+  };
+
+  var map = function(array, func) {
+    if (nativeMap && array.map)
+      return array.map(func);
+    var results = [];
+    for (var i = 0, len = array.length; i < len; i += 1)
+      results[i] = func(array[i], i, array);
+    return results;
   };
 
   var prop = function(initialValue) {
@@ -175,7 +185,7 @@
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1) {
           var target = targets[i];
-          var sourceValues = target.sources.map(function(source) {
+          var sourceValues = map(target.sources, function(source) {
             return source();
           });
           target.apply(null, sourceValues);
@@ -244,7 +254,7 @@
     target.sources.push(source);
 
     if (source.type === 'prop') {
-      var sourceValues = target.sources.map(function(source) {
+      var sourceValues = map(target.sources, function(source) {
         return source();
       });
       setTimeout(function() {
