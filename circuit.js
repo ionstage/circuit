@@ -190,7 +190,7 @@
       func = function() {
         if (arguments.length === 0)
           return cache;
-        var value = initialValue.apply(this, arguments);
+        var value = initialValue.apply(null, arguments);
         if (value === cache && !isObject(value))
           return;
         cache = value;
@@ -219,7 +219,7 @@
     var sources = [];
     var func = function() {
       if (typeof listener === 'function')
-        listener.call(this);
+        listener();
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)
           targets[i]();

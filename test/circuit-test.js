@@ -379,11 +379,8 @@ describe('.prop', function() {
 
   it('function as argument', function() {
     var func = sinon.spy();
-    var obj = {
-      func: circuit.prop(func)
-    };
-    obj.func(1);
-    assert(func.calledOn(obj));
+    var prop = circuit.prop(func);
+    prop(1);
     assert(func.calledWith(1));
   });
 });
@@ -391,11 +388,9 @@ describe('.prop', function() {
 describe('.event', function() {
   it('wrap function', function() {
     var func = sinon.spy();
-    var obj = {
-      func: circuit.event(func)
-    };
-    obj.func();
-    assert(func.calledOn(obj));
+    var event = circuit.event(func)
+    event();
+    assert(func.called);
   });
 
   it('no argument', function() {
