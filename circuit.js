@@ -197,7 +197,7 @@
 
     if (typeof initialValue === 'function') {
       func = function() {
-        if (arguments.length === 0)
+        if (typeof arguments[0] === 'undefined')
           return cache;
         var value = initialValue.apply(null, arguments);
         if (value === cache && !isObject(value))
