@@ -164,9 +164,6 @@
     if (!source || !target)
       throw new TypeError('Not enough arguments');
 
-    if (source.type !== target.type)
-      throw new TypeError('Cannot connect prop and event');
-
     var targetIndex = indexOf(source.targets, target);
     if (targetIndex === -1)
       throw new Error('Already disconnected');
