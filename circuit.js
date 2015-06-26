@@ -275,6 +275,19 @@
     }
   };
 
+  circuit.unbind = function(source, target) {
+    if (!source || !target)
+      throw new TypeError('Not enough arguments');
+
+    if (indexOf(source.targets, target) === -1)
+      throw new Error('Already unbound');
+
+    var targetIndex = indexOf(source.targets, target);
+    var sourceIndex = indexOf(target.sources, source);
+    target.sources.splice(sourceIndex, 1);
+    source.targets.splice(targetIndex, 1);
+  };
+
   if (typeof module !== 'undefined' && module.exports)
     module.exports = circuit;
   else

@@ -565,6 +565,50 @@ describe('.bind', function() {
   });
 });
 
+describe('unbind', function() {
+  it('prop', function(done) {
+    var a = circuit.prop();
+    var b = circuit.prop();
+    circuit.bind(a, b);
+    circuit.unbind(a, b);
+    var obj = {};
+    a(obj);
+    setTimeout(function() {
+      assert.notEqual(b(), obj);
+      done();
+    }, 0);
+  });
+
+  it('event', function(done) {
+    var a = circuit.event();
+    var func = sinon.spy();
+    var b = circuit.event(func);
+    circuit.bind(a, b);
+    circuit.unbind(a, b);
+    a();
+    setTimeout(function() {
+      assert(!func.called);
+      done();
+    }, 0);
+  });
+
+  it('no argument', function() {
+    assert.throws(function() {
+      circuit.unbind();
+    });
+  });
+
+  it('should not unbind same props many times', function() {
+    var a = circuit.prop();
+    var b = circuit.prop();
+    circuit.bind(a, b);
+    circuit.unbind(a, b);
+    assert.throws(function() {
+      circuit.unbind(a, b);
+    });
+  });
+});
+
 describe('element', function() {
   describe('#updateProperty', function() {
     it('prop', function(done) {
