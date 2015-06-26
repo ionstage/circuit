@@ -226,21 +226,25 @@
   circuit.event = function(listener) {
     var targets = [];
     var sources = [];
+    var dispatch = function() {
+      setTimeout(function() {
+        for (var i = 0, len = targets.length; i < len; i += 1)
+          targets[i]();
+      }, 0);
+    };
     var func = function() {
       var canceled = false;
       var event = {
         cancel: function() {
           canceled = true;
-        }
+        },
+        dispatch: dispatch
       };
       if (typeof listener === 'function')
         listener(event);
       if (canceled)
         return;
-      setTimeout(function() {
-        for (var i = 0, len = targets.length; i < len; i += 1)
-          targets[i]();
-      }, 0);
+      dispatch();
     };
     func.targets = targets;
     func.sources = sources;

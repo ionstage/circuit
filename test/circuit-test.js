@@ -539,6 +539,21 @@ describe('.bind', function() {
       done();
     }, 0);
   });
+
+  it('dispatch event', function(done) {
+    var a = circuit.event(function(event) {
+      event.cancel();
+      event.dispatch();
+    });
+    var func = sinon.spy();
+    var b = circuit.event(func);
+    circuit.bind(a, b);
+    a();
+    setTimeout(function() {
+      assert(func.called);
+      done();
+    }, 0);
+  });
 });
 
 describe('element', function() {
