@@ -525,6 +525,20 @@ describe('.bind', function() {
       done();
     }, 0);
   });
+
+  it('cancel event', function(done) {
+    var a = circuit.event(function(event) {
+      event.cancel();
+    });
+    var func = sinon.spy();
+    var b = circuit.event(func);
+    circuit.bind(a, b);
+    a();
+    setTimeout(function() {
+      assert(!func.called);
+      done();
+    }, 0);
+  });
 });
 
 describe('element', function() {

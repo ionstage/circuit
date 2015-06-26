@@ -227,8 +227,16 @@
     var targets = [];
     var sources = [];
     var func = function() {
+      var canceled = false;
+      var event = {
+        cancel: function() {
+          canceled = true;
+        }
+      };
       if (typeof listener === 'function')
-        listener();
+        listener(event);
+      if (canceled)
+        return;
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1)
           targets[i]();
