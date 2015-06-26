@@ -196,7 +196,6 @@
     var func;
 
     if (typeof initialValue === 'function') {
-      cache = initialValue();
       func = function() {
         if (arguments.length === 0)
           return cache;
