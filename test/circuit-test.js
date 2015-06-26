@@ -461,6 +461,15 @@ describe('.bind', function() {
     });
   });
 
+  it('should not bind same props many times', function() {
+    var a = circuit.prop();
+    var b = circuit.prop();
+    circuit.bind(a, b);
+    assert.throws(function() {
+      circuit.bind(a, b);
+    });
+  });
+
   it('should not update prop when setting same value', function(done) {
     var a = circuit.prop(1);
     var b = sinon.spy();
