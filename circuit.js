@@ -6,13 +6,13 @@
 
 (function(global) {
   'use strict';
-  var nativeIndexOf = Array.prototype.indexOf;
+  var nativeLastIndexOf = Array.prototype.lastIndexOf;
   var nativeMap = Array.prototype.map;
 
-  var indexOf = function(array, item) {
-    if (nativeIndexOf && array.indexOf === nativeIndexOf)
-      return array.indexOf(item);
-    for (var i = 0, len = array.length; i < len; i += 1) {
+  var lastIndexOf = function(array, item) {
+    if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf)
+      return array.lastIndexOf(item);
+    for (var i = array.length - 1; i >= 0; i -= 1) {
       if (array[i] === item)
         return i;
     }
@@ -131,7 +131,7 @@
     if (typeof target['in'] !== 'function')
       throw new TypeError("Target must have 'in' function");
 
-    if (indexOf(source.targets, target) !== -1)
+    if (lastIndexOf(source.targets, target) !== -1)
       throw new Error('Already connected');
 
     target.sources.push(source);
@@ -154,11 +154,11 @@
     if (!source || !target)
       throw new TypeError('Not enough arguments');
 
-    var targetIndex = indexOf(source.targets, target);
+    var targetIndex = lastIndexOf(source.targets, target);
     if (targetIndex === -1)
       throw new Error('Already disconnected');
 
-    var sourceIndex = indexOf(target.sources, source);
+    var sourceIndex = lastIndexOf(target.sources, source);
     target.sources.splice(sourceIndex, 1);
     source.targets.splice(targetIndex, 1);
   };
@@ -259,11 +259,11 @@
     if (!source || !target)
       throw new TypeError('Not enough arguments');
 
-    var targetIndex = indexOf(source.targets, target);
+    var targetIndex = lastIndexOf(source.targets, target);
     if (targetIndex === -1)
       throw new Error('Already unbound');
 
-    var sourceIndex = indexOf(target.sources, source);
+    var sourceIndex = lastIndexOf(target.sources, source);
     target.sources.splice(sourceIndex, 1);
     source.targets.splice(targetIndex, 1);
   };
