@@ -33,6 +33,10 @@
     return results;
   };
 
+  var identity = function(value) {
+    return value;
+  };
+
   var sendMessage = function(target, args, type) {
     setTimeout(function() {
       if (typeof target['in'] === 'function') {
@@ -169,6 +173,16 @@
   circuit.prop = function(initialValue) {
     var targets = [];
     var sources = [];
+    var cache;
+    var prop;
+
+    if (typeof initialValue !== 'function') {
+      cache = initialValue;
+      prop = identity;
+    } else {
+      prop = initialValue;
+    }
+
     var update = function() {
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i += 1) {
@@ -180,30 +194,16 @@
         }
       }, 0);
     };
-    var cache;
-    var func;
 
-    if (typeof initialValue === 'function') {
-      func = function() {
-        if (typeof arguments[0] === 'undefined')
-          return cache;
-        var value = initialValue.apply(null, arguments);
-        if (value === cache && !isObject(value))
-          return;
-        cache = value;
-        update();
-      };
-    } else {
-      cache = initialValue;
-      func = function(value) {
-        if (typeof value === 'undefined')
-          return cache;
-        if (value === cache && !isObject(value))
-          return;
-        cache = value;
-        update();
-      };
-    }
+    var func = function() {
+      if (typeof arguments[0] === 'undefined')
+        return cache;
+      var value = prop.apply(null, arguments);
+      if (value === cache && !isObject(value))
+        return;
+      cache = value;
+      update();
+    };
 
     func.targets = targets;
     func.sources = sources;
