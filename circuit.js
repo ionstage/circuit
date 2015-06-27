@@ -1,5 +1,5 @@
 /**
- * circuit v0.1.4
+ * circuit v0.2.0
  * (c) 2015 iOnStage
  * Released under the MIT License.
  */
