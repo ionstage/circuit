@@ -242,9 +242,6 @@
     if (source.type !== target.type)
       throw new TypeError('Cannot bind prop and event');
 
-    if (indexOf(source.targets, target) !== -1)
-      throw new Error('Already bound');
-
     source.targets.push(target);
     target.sources.push(source);
 

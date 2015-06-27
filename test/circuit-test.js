@@ -100,15 +100,6 @@ describe('.bind', function() {
     });
   });
 
-  it('should not bind same props many times', function() {
-    var a = circuit.prop();
-    var b = circuit.prop();
-    circuit.bind(a, b);
-    assert.throws(function() {
-      circuit.bind(a, b);
-    });
-  });
-
   it('should not update prop when setting same value', function(done) {
     var a = circuit.prop(1);
     var b = sinon.spy();
@@ -153,6 +144,18 @@ describe('.bind', function() {
     a(1);
     setTimeout(function() {
       assert(obj.prop.thirdCall.calledWith(1, 1));
+      done();
+    }, 0);
+  });
+
+  it('bind same prop more than once', function(done) {
+    var a = circuit.prop(1);
+    var func = sinon.spy();
+    var b = circuit.prop(func);
+    circuit.bind(a, b);
+    circuit.bind(a, b);
+    setTimeout(function() {
+      assert(func.secondCall.calledWith(1, 1));
       done();
     }, 0);
   });
