@@ -12,7 +12,7 @@
   var lastIndexOf = function(array, item) {
     if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf)
       return array.lastIndexOf(item);
-    for (var i = array.length - 1; i >= 0; i -= 1) {
+    for (var i = array.length - 1; i >= 0; i--) {
       if (array[i] === item)
         return i;
     }
@@ -23,8 +23,9 @@
     if (nativeMap && array.map)
       return array.map(func);
     var results = [];
-    for (var i = 0, len = array.length; i < len; i += 1)
+    for (var i = 0, len = array.length; i < len; i++) {
       results[i] = func(array[i], i, array);
+    }
     return results;
   };
 
@@ -57,13 +58,14 @@
     if (type !== 'prop' || targets.length === 0)
       source.out();
 
-    for (var ti = 0, tlen = targets.length; ti < tlen; ti += 1) {
+    for (var ti = 0, tlen = targets.length; ti < tlen; ti++) {
       var target = targets[ti];
       var args = [];
       if (type === 'prop') {
         var sources = target.sources;
-        for (var si = 0, slen = sources.length; si < slen; si += 1)
+        for (var si = 0, slen = sources.length; si < slen; si++) {
           args.push(sources[si].out());
+        }
       }
       sendMessage(target, args, type);
     }
@@ -81,7 +83,7 @@
     var updateTargets = [];
     var timer = null;
     return function(propTargets) {
-      for (var i = 0, len = propTargets.length; i < len; i += 1) {
+      for (var i = 0, len = propTargets.length; i < len; i++) {
         var target = propTargets[i];
         var index = lastIndexOf(updateTargets, target);
         if (index !== -1)
@@ -93,7 +95,7 @@
         return;
 
       timer = setTimeout(function() {
-        for (var i = 0, len = updateTargets.length; i < len; i += 1) {
+        for (var i = 0, len = updateTargets.length; i < len; i++) {
           var target = updateTargets[i];
           var sourceValues = map(target.sources, function(source) {
             return source();
@@ -114,7 +116,7 @@
     };
     var types = ['prop', 'event'];
 
-    for (var i = 0, len = types.length; i < len; i += 1) {
+    for (var i = 0, len = types.length; i < len; i++) {
       var type = types[i];
       var typeObject = {};
       var baseTypeObject = (base && type in base) ? base[type] : {};
@@ -170,8 +172,9 @@
         if (typeof target['in'] === 'function') {
           var sources = target.sources;
           var args = [];
-          for (var i = 0, len = sources.length; i < len; i += 1)
+          for (var i = 0, len = sources.length; i < len; i++) {
             args.push(sources[i].out());
+          }
           target['in'].apply(target, args);
         }
       }, 0);
@@ -225,12 +228,15 @@
   circuit.event = function(listener) {
     var targets = [];
     var sources = [];
+
     var dispatch = function() {
       setTimeout(function() {
-        for (var i = 0, len = targets.length; i < len; i += 1)
+        for (var i = 0, len = targets.length; i < len; i++) {
           targets[i]();
+        }
       }, 0);
     };
+
     var func = function() {
       var canceled = false;
       var event = {
@@ -245,6 +251,7 @@
         return;
       dispatch();
     };
+
     func.targets = targets;
     func.sources = sources;
     func.type = 'event';
