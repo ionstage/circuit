@@ -9,11 +9,6 @@
   var nativeIndexOf = Array.prototype.indexOf;
   var nativeMap = Array.prototype.map;
 
-  var isObject = function(obj) {
-    var type = typeof obj;
-    return type === 'object' && obj !== null;
-  };
-
   var indexOf = function(array, item) {
     if (nativeIndexOf && array.indexOf === nativeIndexOf)
       return array.indexOf(item);
@@ -199,7 +194,7 @@
       if (typeof arguments[0] === 'undefined')
         return cache;
       var value = prop.apply(null, arguments);
-      if (value === cache && !isObject(value))
+      if (value === cache)
         return;
       cache = value;
       update();
