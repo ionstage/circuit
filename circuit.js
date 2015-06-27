@@ -77,6 +77,34 @@
     processConnection(this, 'event', key);
   };
 
+  var updatePropTargets = (function() {
+    var updateTargets = [];
+    var timer = null;
+    return function(propTargets) {
+      for (var i = 0, len = propTargets.length; i < len; i += 1) {
+        var target = propTargets[i];
+        var index = lastIndexOf(updateTargets, target);
+        if (index !== -1)
+          updateTargets.splice(index, 1);
+        updateTargets.push(target);
+      }
+
+      if (timer !== null)
+        return;
+
+      timer = setTimeout(function() {
+        for (var i = 0, len = updateTargets.length; i < len; i += 1) {
+          var target = updateTargets[i];
+          var sourceValues = map(target.sources, function(source) {
+            return source();
+          });
+          target.apply(null, sourceValues);
+        }
+        timer = null;
+      }, 0);
+    };
+  })();
+
   var circuit = {};
 
   circuit.create = function(base) {
@@ -178,18 +206,6 @@
       prop = initialValue;
     }
 
-    var update = function() {
-      setTimeout(function() {
-        for (var i = 0, len = targets.length; i < len; i += 1) {
-          var target = targets[i];
-          var sourceValues = map(target.sources, function(source) {
-            return source();
-          });
-          target.apply(null, sourceValues);
-        }
-      }, 0);
-    };
-
     var func = function() {
       if (typeof arguments[0] === 'undefined')
         return cache;
@@ -197,7 +213,7 @@
       if (value === cache)
         return;
       cache = value;
-      update();
+      updatePropTargets(targets);
     };
 
     func.targets = targets;
@@ -245,14 +261,8 @@
     source.targets.push(target);
     target.sources.push(source);
 
-    if (source.type === 'prop') {
-      var sourceValues = map(target.sources, function(source) {
-        return source();
-      });
-      setTimeout(function() {
-        target.apply(null, sourceValues);
-      }, 0);
-    }
+    if (source.type === 'prop')
+      updatePropTargets([target]);
   };
 
   circuit.unbind = function(source, target) {

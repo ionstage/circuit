@@ -143,7 +143,7 @@ describe('.bind', function() {
     circuit.bind(b, obj.prop);
     a(1);
     setTimeout(function() {
-      assert(obj.prop.thirdCall.calledWith(1, 1));
+      assert(obj.prop.calledWith(1, 1));
       done();
     }, 0);
   });
@@ -155,7 +155,21 @@ describe('.bind', function() {
     circuit.bind(a, b);
     circuit.bind(a, b);
     setTimeout(function() {
-      assert(func.secondCall.calledWith(1, 1));
+      assert(func.calledWith(1, 1));
+      done();
+    }, 0);
+  });
+
+  it('update prop values at the same time', function(done) {
+    var a = circuit.prop(1);
+    var b = circuit.prop(1);
+    var func = sinon.spy();
+    var c = circuit.prop(func);
+    circuit.bind(a, c);
+    circuit.bind(b, c);
+    a(2);
+    setTimeout(function() {
+      assert(func.firstCall.calledWith(2, 1));
       done();
     }, 0);
   });
