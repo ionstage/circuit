@@ -33,15 +33,6 @@
     return results;
   };
 
-  var prop = function(initialValue) {
-    var cache = initialValue;
-    return function(value) {
-      if (typeof value === 'undefined')
-        return cache;
-      cache = value;
-    };
-  };
-
   var sendMessage = function(target, args, type) {
     setTimeout(function() {
       if (typeof target['in'] === 'function') {
