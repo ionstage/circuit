@@ -281,6 +281,10 @@
       throw new Error('Already unbound');
 
     var sourceIndex = lastIndexOf(target.sources, source);
+
+    if (target.type === 'prop' && target.dirty)
+      target();
+
     target.sources.splice(sourceIndex, 1);
     source.targets.splice(targetIndex, 1);
   };

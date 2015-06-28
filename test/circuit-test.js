@@ -258,4 +258,13 @@ describe('unbind', function() {
       circuit.unbind(a, b);
     });
   });
+
+  it('update prop cache', function() {
+    var a = circuit.prop(0);
+    var b = circuit.prop(0);
+    circuit.bind(a, b);
+    a(1);
+    circuit.unbind(a, b);
+    assert.equal(b(), 1);
+  });
 });
