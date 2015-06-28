@@ -79,7 +79,7 @@
     processConnection(this, 'event', key);
   };
 
-  var makeDirty = (function() {
+  var markDirtyTargets = (function() {
     var dirtyTargets = [];
     var timer = null;
     return function(targets) {
@@ -90,7 +90,7 @@
         target.dirty = true;
         if(lastIndexOf(dirtyTargets, target) === -1)
           dirtyTargets.push(target);
-        makeDirty(target.targets);
+        markDirtyTargets(target.targets);
       }
 
       if (timer !== null)
@@ -210,21 +210,43 @@
       prop = initialValue;
     }
 
+    var markDirty = (function() {
+      var timer = null;
+      return function() {
+        markDirtyTargets(targets);
+        if (!func.dirty)
+          return;
+        if (timer === null) {
+          timer = setTimeout(function() {
+            timer = null;
+            func.dirty = true;
+            update();
+          }, 0);
+        }
+        func.dirty = false;
+      };
+    })();
+
     var update = function() {
       if (!func.dirty)
         return;
 
-      var included = false;
       var sourceValues = map(sources, function(source) {
-        if (source === func) {
-          included = true;
+        if (source === func)
           return cache;
-        }
         return source();
       });
 
-      cache = prop.apply(null, sourceValues);
-      func.dirty = included;
+      var value = prop.apply(null, sourceValues);
+      if (value === cache) {
+        func.dirty = false;
+        return;
+      }
+
+      cache = value;
+      func.dirty = false;
+
+      markDirty();
     };
 
     var func = function() {
@@ -236,17 +258,11 @@
       var value = prop.apply(null, arguments);
       if (value === cache)
         return;
+
       cache = value;
       func.dirty = false;
 
-      makeDirty(targets);
-
-      if (func.dirty) {
-        setTimeout(function() {
-          func.dirty = true;
-        }, 0);
-        func.dirty = false;
-      }
+      markDirty();
     };
 
     func.targets = targets;
@@ -308,7 +324,7 @@
     target.sources.push(source);
 
     if (source.type === 'prop')
-      makeDirty([target]);
+      markDirtyTargets([target]);
   };
 
   circuit.unbind = function(source, target) {
