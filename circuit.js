@@ -79,50 +79,6 @@
     processConnection(this, 'event', key);
   };
 
-  var updatePropTargets = (function() {
-    var updateTargets = [];
-    var timer = null;
-
-    var update = function() {
-      var targets = updateTargets.concat();
-      updateTargets = [];
-      for (var ti = 0, tlen = targets.length; ti < tlen; ti++) {
-        var target = targets[ti];
-        var sourceValues = map(target.sources, function(source) {
-          return source();
-        });
-        target.apply(null, sourceValues);
-
-        // if the rest of this updates include the target,
-        // need not to update at next tick
-        for (var ui = updateTargets.length - 1; ui >= 0; ui--) {
-          var updateTarget = updateTargets[ui];
-          var index = lastIndexOf(targets, updateTarget);
-          if (index !== -1 && ui < index)
-            updateTargets.splice(ui, 1);
-        }
-      }
-    };
-
-    return function(propTargets) {
-      for (var i = 0, len = propTargets.length; i < len; i++) {
-        var target = propTargets[i];
-        var index = lastIndexOf(updateTargets, target);
-        if (index !== -1)
-          updateTargets.splice(index, 1);
-        updateTargets.push(target);
-      }
-
-      if (updateTargets.length === 0)
-        return;
-
-      if (timer)
-        clearTimeout(timer);
-
-      timer = setTimeout(update, 0);
-    };
-  })();
-
   var circuit = {};
 
   circuit.create = function(base) {
@@ -225,19 +181,40 @@
       prop = initialValue;
     }
 
+    var update = function() {
+      if (!func.dirty)
+        return;
+      func.dirty = false;
+      var included = false;
+      var sourceValues = map(sources, function(source) {
+        if (source === func)
+          included = true;
+        return source();
+      });
+      cache = prop.apply(null, sourceValues);
+      if (included)
+        func.dirty = true;
+    };
+
     var func = function() {
-      if (typeof arguments[0] === 'undefined')
+      if (typeof arguments[0] === 'undefined') {
+        update();
         return cache;
+      }
+
       var value = prop.apply(null, arguments);
       if (value === cache)
         return;
       cache = value;
-      updatePropTargets(targets);
+      for (var i = 0, len = targets.length; i < len; i++) {
+        targets[i].dirty = true;
+      }
     };
 
     func.targets = targets;
     func.sources = sources;
     func.type = 'prop';
+    func.dirty = false;
     return func;
   };
 
@@ -285,7 +262,7 @@
     target.sources.push(source);
 
     if (source.type === 'prop')
-      updatePropTargets([target]);
+      target.dirty = true;
   };
 
   circuit.unbind = function(source, target) {
