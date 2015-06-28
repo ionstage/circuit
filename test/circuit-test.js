@@ -201,6 +201,19 @@ describe('.bind', function() {
     assert.equal(b(), 2);
   });
 
+  it('bind prop in circle chain', function() {
+    var a = circuit.prop(0);
+    var b = circuit.prop(1);
+    var c = circuit.prop(2);
+    circuit.bind(a, b);
+    circuit.bind(b, c);
+    circuit.bind(c, a);
+    a(1);
+    assert.equal(a(), 1);
+    assert.equal(b(), 1);
+    assert.equal(c(), 1);
+  });
+
   it('cancel event', function(done) {
     var a = circuit.event(function(event) {
       event.cancel();

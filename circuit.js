@@ -231,6 +231,8 @@
       if (!func.dirty)
         return;
 
+      func.dirty = false;
+
       var sourceValues = map(sources, function(source) {
         if (source === func)
           return cache;
@@ -238,10 +240,8 @@
       });
 
       var value = prop.apply(null, sourceValues);
-      if (value === cache) {
-        func.dirty = false;
+      if (value === cache)
         return;
-      }
 
       cache = value;
       func.dirty = false;
