@@ -201,6 +201,19 @@ describe('.bind', function() {
       done();
     }, 0);
   });
+
+  it('event context', function(done) {
+    var a = circuit.event(function(event) {
+      assert.equal(event.context, 1);
+      event.context += 1;
+    });
+    var b = circuit.event(function(event) {
+      assert.equal(event.context, 2);
+      done();
+    });
+    circuit.bind(a, b);
+    a(1);
+  });
 });
 
 describe('unbind', function() {

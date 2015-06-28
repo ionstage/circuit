@@ -222,27 +222,28 @@
     var targets = [];
     var sources = [];
 
-    var dispatch = function() {
+    var dispatch = function(context) {
       setTimeout(function() {
         for (var i = 0, len = targets.length; i < len; i++) {
-          targets[i]();
+          targets[i](context);
         }
       }, 0);
     };
 
-    var func = function() {
+    var func = function(context) {
       var canceled = false;
       var event = {
         cancel: function() {
           canceled = true;
         },
-        dispatch: dispatch
+        dispatch: dispatch,
+        context: context
       };
       if (typeof listener === 'function')
         listener(event);
       if (canceled)
         return;
-      dispatch();
+      dispatch(event.context);
     };
 
     func.targets = targets;
