@@ -186,12 +186,14 @@
         return;
       func.dirty = false;
       var included = false;
+
       var sourceValues = map(sources, function(source) {
         if (source === func)
           included = true;
         return source();
       });
       cache = prop.apply(null, sourceValues);
+
       if (included)
         func.dirty = true;
     };
@@ -206,6 +208,7 @@
       if (value === cache)
         return;
       cache = value;
+
       for (var i = 0, len = targets.length; i < len; i++) {
         targets[i].dirty = true;
       }
@@ -239,10 +242,13 @@
         dispatch: dispatch,
         context: context
       };
+
       if (typeof listener === 'function')
         listener(event);
+
       if (canceled)
         return;
+
       dispatch(event.context);
     };
 
