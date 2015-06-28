@@ -79,23 +79,34 @@
     processConnection(this, 'event', key);
   };
 
-  var makeDirty = function(targets) {
-    for (var i = 0, len = targets.length; i < len; i++) {
-      var target = targets[i];
-      if (target.dirty)
-        continue;
-      target.dirty = true;
-      makeDirty(target.targets);
-    }
-
-    setTimeout(function() {
+  var makeDirty = (function() {
+    var dirtyTargets = [];
+    var timer = null;
+    return function(targets) {
       for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
         if (target.dirty)
-          target();
+          continue;
+        target.dirty = true;
+        if(lastIndexOf(dirtyTargets, target) === -1)
+          dirtyTargets.push(target);
+        makeDirty(target.targets);
       }
-    }, 0);
-  };
+
+      if (timer !== null)
+        return;
+
+      timer = setTimeout(function() {
+        for (var i = 0, len = dirtyTargets.length; i < len; i++) {
+          var target = dirtyTargets[i];
+          if (target.dirty)
+            target();
+        }
+        dirtyTargets = [];
+        timer = null;
+      }, 0);
+    };
+  })();
 
   var circuit = {};
 
