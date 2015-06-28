@@ -91,6 +91,17 @@ var hello = circuit.event(function() {
 hello(); // output: "Hello, World!"
 ```
 
+Get argument as event context (event.context())
+```js
+var text = 'Hello, world!';
+
+var hello = circuit.event(function(event) {
+  console.log(event.context());
+});
+
+hello(text); // output: "Hello, World!"
+```
+
 ### bind
 Bind arguments of prop function (data synchronization)
 ```js
@@ -103,12 +114,23 @@ circuit.bind(a, b);
 // change value of 'a'
 a(1);
 
-console.log(b()); // output: 0
+console.log(b()); // output: 1
+```
 
-// value of 'b' change asynchronously
-setTimeout(function() {
-  console.log(b()); // output: 1
-}, 0);
+Support lazy evaluation
+```js
+var a = circuit.prop(0);
+var b = circuit.prop(function(value) {
+  console.log('b is called');
+  return value;
+});
+circuit.bind(a, b);
+
+for (var i = 0; i < 10000; i++) {
+  a(i);
+}
+
+b(); // output "b is called" only once
 ```
 
 Multiple bind for prop function
@@ -128,9 +150,7 @@ circuit.bind(b, sum);
 a(2);
 b(3);
 
-setTimeout(function() {
-  console.log(sum()); // output: 5
-}, 0);
+console.log(sum()); // output: 5
 ```
 
 Create event chains
@@ -188,6 +208,21 @@ a();
 // event 'c' will be called 1 second after
 ```
 
+Relay event context
+```js
+var a = circuit.event(function(event) {
+  var context = event.context;
+  context(context() + 1);
+});
+var b = circuit.event(function(event) {
+  console.log(event.context());
+});
+circuit.bind(a, b);
+a(1);
+
+// event 'b' will be called and output `2`
+```
+
 ### unbind
 Cancel binding of prop/event functions
 ```js
@@ -200,9 +235,7 @@ circuit.unbind(a, b);
 
 a(1);
 
-setTimeout(function() {
-  console.log(b()); // output: 0
-}, 0);
+console.log(b()); // output: 0
 ```
 
 ## Deprecated API
@@ -355,7 +388,6 @@ circuit.bind(qux.clock, foo.countUp);
 circuit.bind(main.start, qux.clock);
 
 main.start();
-// print the square of i(count up per second)
 
 setTimeout(function() {
   circuit.unbind(qux.clock, foo.countUp);
