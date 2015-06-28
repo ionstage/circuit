@@ -118,32 +118,34 @@ describe('.bind', function() {
 
   it('should not update binding prop immediately', function() {
     var a = circuit.prop(1);
-    var b = sinon.spy();
-    b.type = 'prop';
-    b.sources = [];
-    b.targets = [];
+    var func = sinon.spy();
+    var b = circuit.prop(func);
     circuit.bind(a, b);
     a(2);
-    assert(!b.called);
+    assert(!func.called);
+  });
+
+  it('shoud update binding prop when the call stack has cleared', function(done) {
+    var a = circuit.prop(1);
+    var func = sinon.spy();
+    var b = circuit.prop(func);
+    circuit.bind(a, b);
+    a(2);
     setTimeout(function() {
-      assert(b.called);
+      assert(func.called);
+      done();
     }, 0);
   });
 
-  it('bind prop with setting function as argument', function(done) {
+  it('bind prop with setting function as argument', function() {
     var a = circuit.prop(function(value) {
       return value;
     });
     var b = circuit.prop();
     circuit.bind(a, b);
-    setTimeout(function() {
-      var obj = {};
-      a(obj);
-      setTimeout(function() {
-        assert.equal(b(), obj);
-        done();
-      }, 0);
-    }, 0);
+    var obj = {};
+    a(obj);
+    assert.equal(b(), obj);
   });
 
   it('bind prop more than once', function() {
@@ -225,17 +227,14 @@ describe('.bind', function() {
 });
 
 describe('unbind', function() {
-  it('prop', function(done) {
+  it('prop', function() {
     var a = circuit.prop();
     var b = circuit.prop();
     circuit.bind(a, b);
     circuit.unbind(a, b);
     var obj = {};
     a(obj);
-    setTimeout(function() {
-      assert.notEqual(b(), obj);
-      done();
-    }, 0);
+    assert.notEqual(b(), obj);
   });
 
   it('event', function(done) {
