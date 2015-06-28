@@ -268,7 +268,11 @@
           canceled = true;
         },
         dispatch: dispatch,
-        context: context
+        context: function(value) {
+          if (typeof value === 'undefined')
+            return context;
+          context = value;
+        }
       };
 
       if (typeof listener === 'function')
@@ -277,7 +281,7 @@
       if (canceled)
         return;
 
-      dispatch(event.context);
+      dispatch(event.context());
     };
 
     func.targets = targets;

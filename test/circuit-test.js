@@ -214,11 +214,12 @@ describe('.bind', function() {
 
   it('event context', function(done) {
     var a = circuit.event(function(event) {
-      assert.equal(event.context, 1);
-      event.context += 1;
+      var context = event.context;
+      assert.equal(context(), 1);
+      context(context() + 1);
     });
     var b = circuit.event(function(event) {
-      assert.equal(event.context, 2);
+      assert.equal(event.context(), 2);
       done();
     });
     circuit.bind(a, b);
