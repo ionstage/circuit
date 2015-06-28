@@ -79,6 +79,24 @@
     processConnection(this, 'event', key);
   };
 
+  var makeDirty = function(targets) {
+    for (var i = 0, len = targets.length; i < len; i++) {
+      var target = targets[i];
+      if (target.dirty)
+        continue;
+      target.dirty = true;
+      makeDirty(target.targets);
+    }
+
+    setTimeout(function() {
+      for (var i = 0, len = targets.length; i < len; i++) {
+        var target = targets[i];
+        if (target.dirty)
+          target();
+      }
+    }, 0);
+  };
+
   var circuit = {};
 
   circuit.create = function(base) {
@@ -208,10 +226,9 @@
       if (value === cache)
         return;
       cache = value;
+      func.dirty = false;
 
-      for (var i = 0, len = targets.length; i < len; i++) {
-        targets[i].dirty = true;
-      }
+      makeDirty(targets);
     };
 
     func.targets = targets;
@@ -269,7 +286,7 @@
     target.sources.push(source);
 
     if (source.type === 'prop')
-      target.dirty = true;
+      makeDirty([target]);
   };
 
   circuit.unbind = function(source, target) {

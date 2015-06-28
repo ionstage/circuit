@@ -45,11 +45,15 @@ describe('.bind', function() {
     var obj0 = {};
     var a = circuit.prop(obj0);
     var b = circuit.prop();
+    var c = circuit.prop();
+    var d = circuit.prop();
     circuit.bind(a, b);
-    assert.equal(b(), obj0);
+    circuit.bind(b, c);
+    circuit.bind(c, d);
+    assert.equal(d(), obj0);
     var obj1 = {};
     a(obj1);
-    assert.equal(b(), obj1);
+    assert.equal(d(), obj1);
   });
 
   it('event', function(done) {
@@ -117,9 +121,13 @@ describe('.bind', function() {
     var b = sinon.spy();
     b.type = 'prop';
     b.sources = [];
+    b.targets = [];
     circuit.bind(a, b);
     a(2);
     assert(!b.called);
+    setTimeout(function() {
+      assert(b.called);
+    }, 0);
   });
 
   it('bind prop with setting function as argument', function(done) {
