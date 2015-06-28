@@ -286,16 +286,17 @@
 
     var func = function(context) {
       var canceled = false;
+      var contextProp = function(value) {
+        if (typeof value === 'undefined')
+          return context;
+        context = value;
+      };
       var event = {
         cancel: function() {
           canceled = true;
         },
         dispatch: dispatch,
-        context: function(value) {
-          if (typeof value === 'undefined')
-            return context;
-          context = value;
-        }
+        context: contextProp
       };
 
       if (typeof listener === 'function')
@@ -303,6 +304,9 @@
 
       if (canceled)
         return;
+
+      if (typeof event.context !== 'function')
+        event.context = contextProp;
 
       dispatch(event.context());
     };

@@ -256,6 +256,20 @@ describe('.bind', function() {
     circuit.bind(a, b);
     a(1);
   });
+
+  it('assignment to event context', function(done) {
+    var a = circuit.event(function(event) {
+      event.context = 1;
+    });
+    var b = circuit.event(function(event) {
+      assert.doesNotThrow(function() {
+        event.context();
+      });
+      done();
+    });
+    circuit.bind(a, b);
+    a();
+  });
 });
 
 describe('unbind', function() {
