@@ -82,6 +82,28 @@
   var updatePropTargets = (function() {
     var updateTargets = [];
     var timer = null;
+
+    var update = function() {
+      var targets = updateTargets.concat();
+      updateTargets = [];
+      for (var ti = 0, tlen = targets.length; ti < tlen; ti++) {
+        var target = targets[ti];
+        var sourceValues = map(target.sources, function(source) {
+          return source();
+        });
+        target.apply(null, sourceValues);
+
+        // if the rest of this updates include the target,
+        // need not to update at next tick
+        for (var ui = updateTargets.length - 1; ui >= 0; ui--) {
+          var updateTarget = updateTargets[ui];
+          var index = lastIndexOf(targets, updateTarget);
+          if (index !== -1 && ui < index)
+            updateTargets.splice(ui, 1);
+        }
+      }
+    };
+
     return function(propTargets) {
       for (var i = 0, len = propTargets.length; i < len; i++) {
         var target = propTargets[i];
@@ -91,19 +113,13 @@
         updateTargets.push(target);
       }
 
-      if (timer !== null)
+      if (updateTargets.length === 0)
         return;
 
-      timer = setTimeout(function() {
-        for (var i = 0, len = updateTargets.length; i < len; i++) {
-          var target = updateTargets[i];
-          var sourceValues = map(target.sources, function(source) {
-            return source();
-          });
-          target.apply(null, sourceValues);
-        }
-        timer = null;
-      }, 0);
+      if (timer)
+        clearTimeout(timer);
+
+      timer = setTimeout(update, 0);
     };
   })();
 
