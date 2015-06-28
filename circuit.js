@@ -85,11 +85,15 @@
     return function(targets) {
       for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
+
         if (target.dirty)
           continue;
+
         target.dirty = true;
+
         if(lastIndexOf(dirtyTargets, target) === -1)
           dirtyTargets.push(target);
+
         markDirtyTargets(target.targets);
       }
 
@@ -102,6 +106,7 @@
           if (target.dirty)
             target();
         }
+
         dirtyTargets = [];
         timer = null;
       }, 0);
@@ -214,8 +219,10 @@
       var timer = null;
       return function() {
         markDirtyTargets(targets);
+
         if (!func.dirty)
           return;
+
         if (timer === null) {
           timer = setTimeout(function() {
             timer = null;
@@ -223,6 +230,7 @@
             update();
           }, 0);
         }
+
         func.dirty = false;
       };
     })();
@@ -286,11 +294,13 @@
 
     var func = function(context) {
       var canceled = false;
+
       var contextProp = function(value) {
         if (typeof value === 'undefined')
           return context;
         context = value;
       };
+
       var event = {
         cancel: function() {
           canceled = true;
