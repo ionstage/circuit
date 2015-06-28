@@ -213,18 +213,18 @@
     var update = function() {
       if (!func.dirty)
         return;
-      func.dirty = false;
-      var included = false;
 
+      var included = false;
       var sourceValues = map(sources, function(source) {
-        if (source === func)
+        if (source === func) {
           included = true;
+          return cache;
+        }
         return source();
       });
-      cache = prop.apply(null, sourceValues);
 
-      if (included)
-        func.dirty = true;
+      cache = prop.apply(null, sourceValues);
+      func.dirty = included;
     };
 
     var func = function() {
@@ -240,6 +240,13 @@
       func.dirty = false;
 
       makeDirty(targets);
+
+      if (func.dirty) {
+        setTimeout(function() {
+          func.dirty = true;
+        }, 0);
+        func.dirty = false;
+      }
     };
 
     func.targets = targets;

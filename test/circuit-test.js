@@ -106,14 +106,20 @@ describe('.bind', function() {
     assert.equal(a(), 1);
   });
 
-  it('bind same prop with function', function() {
+  it('bind same prop with function', function(done) {
     var a = circuit.prop(function(x) {
       return x + 1;
     });
     circuit.bind(a, a);
     a(1);
-    assert.equal(a(), 3);
-    assert.equal(a(), 4);
+    assert.equal(a(), 2);
+    setTimeout(function() {
+      assert.equal(a(), 3);
+      setTimeout(function() {
+        assert.equal(a(), 4);
+        done();
+      });
+    });
   });
 
   it('should not update binding prop immediately', function() {
@@ -181,6 +187,18 @@ describe('.bind', function() {
     a(2);
     c();
     assert(func.calledOnce);
+  });
+
+  it('bind prop each other', function() {
+    var a = circuit.prop(0);
+    var b = circuit.prop(0);
+    circuit.bind(a, b);
+    circuit.bind(b, a);
+
+    b(1);
+    assert.equal(a(), 1);
+    a(2);
+    assert.equal(b(), 2);
   });
 
   it('cancel event', function(done) {
