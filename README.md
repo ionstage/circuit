@@ -1,6 +1,7 @@
 # circuit
 
 Data binding library
+
 ```js
 var i = circuit.prop(0);
 var square = circuit.prop(function(x) {
@@ -21,28 +22,39 @@ setInterval(function() {
 ```
 
 ## Features
+
 - Cross-browser: works on IE6+, Firefox, Safari, Chrome, Opera
 - Node.js ready (require('circuit'))
 - Standalone, no dependencies
 
 ## Usage
+
 ### Browser
+
 ```
 <script src="circuit.js"></script>
 ```
+
 ### Node
+
 Install it with npm or add it to your `package.json`:
+
 ```
 $ npm install circuit
 ```
+
 Then:
+
 ```
 var circuit = require('circuit');
 ```
 
 ## API
+
 ### prop
+
 Return a getter/setter function that stores arbitrary data
+
 ```js
 // create a getter-setter with initial value `foo`
 var text = circuit.prop('foo');
@@ -58,6 +70,7 @@ var b = text(); // b == "bar"
 ```
 
 Set function for data transformation
+
 ```js
 // create a getter-setter with function
 var message = circuit.prop(function(name) {
@@ -78,7 +91,9 @@ var b = message(); // b == "Hello, Bob"
 ```
 
 ### event
+
 Return a function for event transmission
+
 ```js
 var text = 'Hello, world!';
 
@@ -92,6 +107,7 @@ hello(); // output: "Hello, World!"
 ```
 
 Get argument as event context (event.context())
+
 ```js
 var text = 'Hello, world!';
 
@@ -103,7 +119,9 @@ hello(text); // output: "Hello, World!"
 ```
 
 ### bind
+
 Bind arguments of prop function (data synchronization)
+
 ```js
 var a = circuit.prop(0);
 var b = circuit.prop(0);
@@ -118,12 +136,14 @@ console.log(b()); // output: 1
 ```
 
 Support lazy evaluation
+
 ```js
 var a = circuit.prop(0);
 var b = circuit.prop(function(value) {
   console.log('b is called');
   return value;
 });
+
 circuit.bind(a, b);
 
 for (var i = 0; i < 10000; i++) {
@@ -134,6 +154,7 @@ b(); // output "b is called" only once
 ```
 
 Multiple bind for prop function
+
 ```js
 var a = circuit.prop(0);
 var b = circuit.prop(0);
@@ -154,6 +175,7 @@ console.log(sum()); // output: 5
 ```
 
 Create event chains
+
 ```js
 var a = circuit.event();
 var b = circuit.event(function() {
@@ -170,6 +192,7 @@ a();
 ```
 
 Cancel event propagation (event.cancel())
+
 ```js
 var a = circuit.event();
 var b = circuit.event(function(event) {
@@ -188,6 +211,7 @@ a();
 ```
 
 Dispatch event later (event.dispatch())
+
 ```js
 var a = circuit.event();
 var b = circuit.event(function(event) {
@@ -209,6 +233,7 @@ a();
 ```
 
 Relay event context
+
 ```js
 var a = circuit.event(function(event) {
   var context = event.context;
@@ -217,6 +242,7 @@ var a = circuit.event(function(event) {
 var b = circuit.event(function(event) {
   console.log(event.context());
 });
+
 circuit.bind(a, b);
 a(1);
 
@@ -224,7 +250,9 @@ a(1);
 ```
 
 ### unbind
+
 Cancel binding of prop/event functions
+
 ```js
 var a = circuit.prop(0);
 var b = circuit.prop(0);
@@ -239,13 +267,16 @@ console.log(b()); // output: 0
 ```
 
 ## Deprecated API
+
 The following methods are deprecated
+
 - create
 - connect
 - disconnect
 - noop
 
 ### SYNOPSIS
+
 ```js
 var foo = circuit.create({
   init: function() {
@@ -342,6 +373,7 @@ setTimeout(function() {
 ```
 
 ### Using new API
+
 ```js
 var Foo = function() {
   this.i = circuit.prop(0);
@@ -401,18 +433,23 @@ setTimeout(function() {
 ```
 
 ## Running tests
+
 Clone the repository and install the developer dependencies:
+
 ```
 git clone https://github.com/ionstage/circuit.git
 cd circuit
 npm install
 ```
+
 Then:
+
 ```
 npm test
 ```
 
 ## License
+
 Copyright &copy; 2015 iOnStage
 Licensed under the [MIT License][mit].
 
