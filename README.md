@@ -126,7 +126,7 @@ Bind arguments of prop function (data synchronization)
 var a = circuit.prop(0);
 var b = circuit.prop(0);
 
-// bind prop 'a' and prop 'b'
+// bind prop 'a' to prop 'b'
 circuit.bind(a, b);
 
 // change value of 'a'
@@ -182,7 +182,7 @@ var b = circuit.event(function() {
   console.log('Hello, world!');
 });
 
-// bind event 'a' and event 'b'
+// bind event 'a' to event 'b'
 circuit.bind(a, b);
 
 // call event 'a'
