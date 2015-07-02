@@ -1,6 +1,6 @@
 {
   "name": "circuit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Data binding library",
   "main": "circuit.js",
   "scripts": {
