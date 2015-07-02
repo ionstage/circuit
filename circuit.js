@@ -242,8 +242,6 @@
       func.dirty = false;
 
       var sourceValues = map(sources, function(source) {
-        if (source === func)
-          return cache;
         return source();
       });
 
