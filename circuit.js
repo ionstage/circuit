@@ -215,25 +215,24 @@
       prop = initialValue;
     }
 
-    var markDirty = (function() {
-      var timer = null;
-      return function() {
-        markDirtyTargets(targets);
+    var func = function() {
+      if (typeof arguments[0] === 'undefined') {
+        update();
+        return cache;
+      }
 
-        if (!func.dirty)
-          return;
+      var value = prop.apply(null, arguments);
+      if (value === cache)
+        return;
 
-        if (timer === null) {
-          timer = setTimeout(function() {
-            timer = null;
-            func.dirty = true;
-            update();
-          }, 0);
-        }
+      updateCache(value);
+      markDirty();
+    };
 
-        func.dirty = false;
-      };
-    })();
+    func.targets = targets;
+    func.sources = sources;
+    func.type = 'prop';
+    func.dirty = false;
 
     var update = function() {
       if (!func.dirty)
@@ -249,46 +248,41 @@
       if (value === cache)
         return;
 
-      cache = value;
-      func.dirty = false;
-
+      updateCache(value);
       markDirty();
     };
 
-    var func = function() {
-      if (typeof arguments[0] === 'undefined') {
-        update();
-        return cache;
-      }
-
-      var value = prop.apply(null, arguments);
-      if (value === cache)
-        return;
-
+    var updateCache = function(value) {
       cache = value;
       func.dirty = false;
-
-      markDirty();
     };
 
-    func.targets = targets;
-    func.sources = sources;
-    func.type = 'prop';
-    func.dirty = false;
+    var markDirty = (function() {
+      var timer = null;
+      return function() {
+        markDirtyTargets(targets);
+
+        if (!func.dirty)
+          return;
+
+        func.dirty = false;
+
+        if (timer === null) {
+          timer = setTimeout(function() {
+            timer = null;
+            func.dirty = true;
+            update();
+          }, 0);
+        }
+      };
+    })();
+
     return func;
   };
 
   circuit.event = function(listener) {
     var targets = [];
     var sources = [];
-
-    var dispatch = function(context) {
-      setTimeout(function() {
-        for (var i = 0, len = targets.length; i < len; i++) {
-          targets[i](context);
-        }
-      }, 0);
-    };
 
     var func = function(context) {
       var canceled = false;
@@ -322,6 +316,15 @@
     func.targets = targets;
     func.sources = sources;
     func.type = 'event';
+
+    var dispatch = function(context) {
+      setTimeout(function() {
+        for (var i = 0, len = targets.length; i < len; i++) {
+          targets[i](context);
+        }
+      }, 0);
+    };
+
     return func;
   };
 
@@ -344,13 +347,14 @@
       throw new TypeError('Not enough arguments');
 
     var targetIndex = lastIndexOf(source.targets, target);
+
     if (targetIndex === -1)
       throw new Error('Already unbound');
 
-    var sourceIndex = lastIndexOf(target.sources, source);
-
     if (target.type === 'prop' && target.dirty)
       target();
+
+    var sourceIndex = lastIndexOf(target.sources, source);
 
     target.sources.splice(sourceIndex, 1);
     source.targets.splice(targetIndex, 1);
