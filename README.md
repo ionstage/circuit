@@ -69,10 +69,10 @@ text('bar');
 var b = text(); // b == "bar"
 ```
 
-Set function for data transformation
+Set a function for data transformation
 
 ```js
-// create a getter-setter with function
+// create a getter-setter with the function
 var message = circuit.prop(function(name) {
   return 'Hello, ' + name;
 });
@@ -106,7 +106,7 @@ var hello = circuit.event(function() {
 hello(); // output: "Hello, World!"
 ```
 
-Get argument as event context (event.context())
+Get an argument of a function as event context (event.context())
 
 ```js
 var text = 'Hello, world!';
@@ -174,7 +174,7 @@ b(3);
 console.log(sum()); // output: 5
 ```
 
-Create event chains
+Create event chain
 
 ```js
 var a = circuit.event();
