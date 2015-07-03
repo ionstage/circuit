@@ -242,7 +242,7 @@ describe('.bind', function() {
     }, 0);
   });
 
-  it('Does not relay argument of the dispatch function as event context', function(done) {
+  it('should not relay argument of the dispatch function as event context', function(done) {
     var a = circuit.event(function(event) {
       event.cancel();
       event.context(1);
