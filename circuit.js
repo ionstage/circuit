@@ -185,12 +185,12 @@
       self.markDirty();
     };
 
-    func.targets = [];
-    func.sources = [];
-    func.type = 'prop';
-    func.dirty = false;
+    func._self = self;
 
     this.func = func;
+    this.targets = [];
+    this.sources = [];
+    this.type = 'prop';
 
     if (typeof initialValue !== 'function') {
       this.cache = initialValue;
@@ -199,20 +199,19 @@
       this.value = initialValue;
     }
 
+    this.dirty = false;
     this.timer = null;
 
     return func;
   };
 
   CircuitProp.prototype.update = function() {
-    var func = this.func;
-
-    if (!func.dirty)
+    if (!this.dirty)
       return;
 
-    func.dirty = false;
+    this.dirty = false;
 
-    var sourceValues = map(func.sources, function(source) {
+    var sourceValues = map(this.sources, function(source) {
       return source();
     });
 
@@ -226,24 +225,22 @@
 
   CircuitProp.prototype.updateCache = function(value) {
     this.cache = value;
-    this.func.dirty = false;
+    this.dirty = false;
   };
 
   CircuitProp.prototype.markDirty = function() {
-    var func = this.func;
+    CircuitProp.markDirtyTargets(this.targets);
 
-    CircuitProp.markDirtyTargets(func.targets);
-
-    if (!func.dirty)
+    if (!this.dirty)
       return;
 
-    func.dirty = false;
+    this.dirty = false;
 
     if (this.timer === null) {
       var self = this;
       this.timer = setTimeout(function() {
         self.timer = null;
-        func.dirty = true;
+        self.dirty = true;
         self.update();
       }, 0);
     }
@@ -256,16 +253,17 @@
     return function(targets) {
       for (var i = 0, len = targets.length; i < len; i++) {
         var target = targets[i];
+        var targetSelf = target._self;
 
-        if (target.dirty)
+        if (targetSelf.dirty)
           continue;
 
-        target.dirty = true;
+        targetSelf.dirty = true;
 
         if(lastIndexOf(dirtyTargets, target) === -1)
           dirtyTargets.push(target);
 
-        CircuitProp.markDirtyTargets(target.targets);
+        CircuitProp.markDirtyTargets(targetSelf.targets);
       }
 
       if (timer !== null)
@@ -274,7 +272,7 @@
       timer = setTimeout(function() {
         for (var i = 0, len = dirtyTargets.length; i < len; i++) {
           var target = dirtyTargets[i];
-          if (target.dirty)
+          if (target._self.dirty)
             target();
         }
 
@@ -315,17 +313,18 @@
       self.dispatch(contextProp());
     };
 
-    func.targets = [];
-    func.sources = [];
-    func.type = 'event';
+    func._self = self;
 
     this.func = func;
+    this.targets = [];
+    this.sources = [];
+    this.type = 'event';
 
     return func;
   };
 
   CircuitEvent.prototype.dispatch = function(context) {
-    var targets = this.func.targets;
+    var targets = this.targets;
     setTimeout(function() {
       for (var i = 0, len = targets.length; i < len; i++) {
         targets[i](context);
@@ -345,13 +344,16 @@
     if (!source || !target)
       throw new TypeError('Not enough arguments');
 
-    if (source.type !== target.type)
+    var sourceSelf = source._self;
+    var targetSelf = target._self;
+
+    if (sourceSelf.type !== targetSelf.type)
       throw new TypeError('Cannot bind prop and event');
 
-    source.targets.push(target);
-    target.sources.push(source);
+    sourceSelf.targets.push(target);
+    targetSelf.sources.push(source);
 
-    if (source.type === 'prop')
+    if (sourceSelf.type === 'prop')
       CircuitProp.markDirtyTargets([target]);
   };
 
@@ -359,18 +361,21 @@
     if (!source || !target)
       throw new TypeError('Not enough arguments');
 
-    var targetIndex = lastIndexOf(source.targets, target);
+    var sourceSelf = source._self;
+    var targetSelf = target._self;
+
+    var targetIndex = lastIndexOf(sourceSelf.targets, target);
 
     if (targetIndex === -1)
       throw new Error('Already unbound');
 
-    if (target.type === 'prop' && target.dirty)
+    if (targetSelf.type === 'prop' && targetSelf.dirty)
       target();
 
-    var sourceIndex = lastIndexOf(target.sources, source);
+    var sourceIndex = lastIndexOf(targetSelf.sources, source);
 
-    target.sources.splice(sourceIndex, 1);
-    source.targets.splice(targetIndex, 1);
+    targetSelf.sources.splice(sourceIndex, 1);
+    sourceSelf.targets.splice(targetIndex, 1);
   };
 
   if (typeof module !== 'undefined' && module.exports)
