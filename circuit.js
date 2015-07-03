@@ -203,8 +203,6 @@
   circuit.noop = function() {};
 
   circuit.prop = function(initialValue) {
-    var targets = [];
-    var sources = [];
     var cache;
     var prop;
 
@@ -229,8 +227,8 @@
       markDirty();
     };
 
-    func.targets = targets;
-    func.sources = sources;
+    func.targets = [];
+    func.sources = [];
     func.type = 'prop';
     func.dirty = false;
 
@@ -240,7 +238,7 @@
 
       func.dirty = false;
 
-      var sourceValues = map(sources, function(source) {
+      var sourceValues = map(func.sources, function(source) {
         return source();
       });
 
@@ -260,7 +258,7 @@
     var markDirty = (function() {
       var timer = null;
       return function() {
-        markDirtyTargets(targets);
+        markDirtyTargets(func.targets);
 
         if (!func.dirty)
           return;
@@ -281,9 +279,6 @@
   };
 
   circuit.event = function(listener) {
-    var targets = [];
-    var sources = [];
-
     var func = function(context) {
       var canceled = false;
 
@@ -313,12 +308,13 @@
       dispatch(event.context());
     };
 
-    func.targets = targets;
-    func.sources = sources;
+    func.targets = [];
+    func.sources = [];
     func.type = 'event';
 
     var dispatch = function(context) {
       setTimeout(function() {
+        var targets = func.targets;
         for (var i = 0, len = targets.length; i < len; i++) {
           targets[i](context);
         }
