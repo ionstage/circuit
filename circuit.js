@@ -79,40 +79,6 @@
     processConnection(this, 'event', key);
   };
 
-  var markDirtyTargets = (function() {
-    var dirtyTargets = [];
-    var timer = null;
-    return function(targets) {
-      for (var i = 0, len = targets.length; i < len; i++) {
-        var target = targets[i];
-
-        if (target.dirty)
-          continue;
-
-        target.dirty = true;
-
-        if(lastIndexOf(dirtyTargets, target) === -1)
-          dirtyTargets.push(target);
-
-        markDirtyTargets(target.targets);
-      }
-
-      if (timer !== null)
-        return;
-
-      timer = setTimeout(function() {
-        for (var i = 0, len = dirtyTargets.length; i < len; i++) {
-          var target = dirtyTargets[i];
-          if (target.dirty)
-            target();
-        }
-
-        dirtyTargets = [];
-        timer = null;
-      }, 0);
-    };
-  })();
-
   var circuit = {};
 
   circuit.create = function(base) {
@@ -202,29 +168,21 @@
 
   circuit.noop = function() {};
 
-  circuit.prop = function(initialValue) {
-    var cache;
-    var prop;
-
-    if (typeof initialValue !== 'function') {
-      cache = initialValue;
-      prop = identity;
-    } else {
-      prop = initialValue;
-    }
+  var CircuitProp = function(initialValue) {
+    var self = this;
 
     var func = function() {
       if (typeof arguments[0] === 'undefined') {
-        update();
-        return cache;
+        self.update();
+        return self.cache;
       }
 
-      var value = prop.apply(null, arguments);
-      if (value === cache)
+      var value = self.value.apply(null, arguments);
+      if (value === self.cache)
         return;
 
-      updateCache(value);
-      markDirty();
+      self.updateCache(value);
+      self.markDirty();
     };
 
     func.targets = [];
@@ -232,53 +190,103 @@
     func.type = 'prop';
     func.dirty = false;
 
-    var update = function() {
-      if (!func.dirty)
-        return;
+    this.func = func;
 
-      func.dirty = false;
+    if (typeof initialValue !== 'function') {
+      this.cache = initialValue;
+      this.value = identity;
+    } else {
+      this.value = initialValue;
+    }
 
-      var sourceValues = map(func.sources, function(source) {
-        return source();
-      });
-
-      var value = prop.apply(null, sourceValues);
-      if (value === cache)
-        return;
-
-      updateCache(value);
-      markDirty();
-    };
-
-    var updateCache = function(value) {
-      cache = value;
-      func.dirty = false;
-    };
-
-    var markDirty = (function() {
-      var timer = null;
-      return function() {
-        markDirtyTargets(func.targets);
-
-        if (!func.dirty)
-          return;
-
-        func.dirty = false;
-
-        if (timer === null) {
-          timer = setTimeout(function() {
-            timer = null;
-            func.dirty = true;
-            update();
-          }, 0);
-        }
-      };
-    })();
+    this.timer = null;
 
     return func;
   };
 
-  circuit.event = function(listener) {
+  CircuitProp.prototype.update = function() {
+    var func = this.func;
+
+    if (!func.dirty)
+      return;
+
+    func.dirty = false;
+
+    var sourceValues = map(func.sources, function(source) {
+      return source();
+    });
+
+    var value = this.value.apply(null, sourceValues);
+    if (value === this.cache)
+      return;
+
+    this.updateCache(value);
+    this.markDirty();
+  };
+
+  CircuitProp.prototype.updateCache = function(value) {
+    this.cache = value;
+    this.func.dirty = false;
+  };
+
+  CircuitProp.prototype.markDirty = function() {
+    var func = this.func;
+
+    CircuitProp.markDirtyTargets(func.targets);
+
+    if (!func.dirty)
+      return;
+
+    func.dirty = false;
+
+    if (this.timer === null) {
+      var self = this;
+      this.timer = setTimeout(function() {
+        self.timer = null;
+        func.dirty = true;
+        self.update();
+      }, 0);
+    }
+  };
+
+  CircuitProp.markDirtyTargets = (function() {
+    var dirtyTargets = [];
+    var timer = null;
+
+    return function(targets) {
+      for (var i = 0, len = targets.length; i < len; i++) {
+        var target = targets[i];
+
+        if (target.dirty)
+          continue;
+
+        target.dirty = true;
+
+        if(lastIndexOf(dirtyTargets, target) === -1)
+          dirtyTargets.push(target);
+
+        CircuitProp.markDirtyTargets(target.targets);
+      }
+
+      if (timer !== null)
+        return;
+
+      timer = setTimeout(function() {
+        for (var i = 0, len = dirtyTargets.length; i < len; i++) {
+          var target = dirtyTargets[i];
+          if (target.dirty)
+            target();
+        }
+
+        dirtyTargets = [];
+        timer = null;
+      }, 0);
+    };
+  })();
+
+  var CircuitEvent = function(listener) {
+    var self = this;
+
     var func = function(context) {
       var canceled = false;
 
@@ -292,7 +300,9 @@
         cancel: function() {
           canceled = true;
         },
-        dispatch: dispatch,
+        dispatch: function(context) {
+          self.dispatch(context);
+        },
         context: contextProp
       };
 
@@ -305,23 +315,33 @@
       if (typeof event.context !== 'function')
         event.context = contextProp;
 
-      dispatch(event.context());
+      self.dispatch(event.context());
     };
 
     func.targets = [];
     func.sources = [];
     func.type = 'event';
 
-    var dispatch = function(context) {
-      setTimeout(function() {
-        var targets = func.targets;
-        for (var i = 0, len = targets.length; i < len; i++) {
-          targets[i](context);
-        }
-      }, 0);
-    };
+    this.func = func;
 
     return func;
+  };
+
+  CircuitEvent.prototype.dispatch = function(context) {
+    var targets = this.func.targets;
+    setTimeout(function() {
+      for (var i = 0, len = targets.length; i < len; i++) {
+        targets[i](context);
+      }
+    }, 0);
+  };
+
+  circuit.prop = function(initialValue) {
+    return new CircuitProp(initialValue);
+  };
+
+  circuit.event = function(listener) {
+    return new CircuitEvent(listener);
   };
 
   circuit.bind = function(source, target) {
@@ -335,7 +355,7 @@
     target.sources.push(source);
 
     if (source.type === 'prop')
-      markDirtyTargets([target]);
+      CircuitProp.markDirtyTargets([target]);
   };
 
   circuit.unbind = function(source, target) {
