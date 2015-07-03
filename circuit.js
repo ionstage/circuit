@@ -312,10 +312,7 @@
       if (canceled)
         return;
 
-      if (typeof event.context !== 'function')
-        event.context = contextProp;
-
-      self.dispatch(event.context());
+      self.dispatch(contextProp());
     };
 
     func.targets = [];
