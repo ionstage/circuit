@@ -242,6 +242,21 @@ describe('.bind', function() {
     }, 0);
   });
 
+  it('Does not relay argument of the dispatch function as event context', function(done) {
+    var a = circuit.event(function(event) {
+      event.cancel();
+      event.context(1);
+      event.dispatch(2);
+    });
+    var b = circuit.event(function(event) {
+      var value = event.context();
+      assert.equal(value, 1);
+      done();
+    });
+    circuit.bind(a, b);
+    a();
+  });
+
   it('event context', function(done) {
     var a = circuit.event(function(event) {
       var context = event.context;

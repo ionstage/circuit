@@ -300,8 +300,8 @@
         cancel: function() {
           canceled = true;
         },
-        dispatch: function(context) {
-          self.dispatch(context);
+        dispatch: function() {
+          self.dispatch(contextProp());
         },
         context: contextProp
       };
