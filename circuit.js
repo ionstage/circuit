@@ -6,12 +6,7 @@
 
 (function(global) {
   'use strict';
-  var nativeLastIndexOf = Array.prototype.lastIndexOf;
-  var nativeMap = Array.prototype.map;
-
   var lastIndexOf = function(array, item) {
-    if (nativeLastIndexOf && array.lastIndexOf === nativeLastIndexOf)
-      return array.lastIndexOf(item);
     for (var i = array.length - 1; i >= 0; i--) {
       if (array[i] === item)
         return i;
@@ -20,10 +15,9 @@
   };
 
   var map = function(array, func) {
-    if (nativeMap && array.map)
-      return array.map(func);
-    var results = [];
-    for (var i = 0, len = array.length; i < len; i++) {
+    var len = array.length;
+    var results = Array(len);
+    for (var i = 0; i < len; i++) {
       results[i] = func(array[i], i, array);
     }
     return results;
