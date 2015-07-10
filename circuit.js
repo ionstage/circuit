@@ -184,7 +184,6 @@
     this.func = func;
     this.targets = [];
     this.sources = [];
-    this.type = 'prop';
 
     if (typeof initialValue !== 'function') {
       this.cache = initialValue;
@@ -313,7 +312,6 @@
     this.func = func;
     this.targets = [];
     this.sources = [];
-    this.type = 'event';
 
     return func;
   };
@@ -342,13 +340,13 @@
     var sourceSelf = source._self;
     var targetSelf = target._self;
 
-    if (sourceSelf.type !== targetSelf.type)
+    if (sourceSelf.constructor !== targetSelf.constructor)
       throw new TypeError('Cannot bind prop and event');
 
     sourceSelf.targets.push(target);
     targetSelf.sources.push(source);
 
-    if (sourceSelf.type === 'prop')
+    if (sourceSelf.constructor === CircuitProp)
       CircuitProp.markDirtyTargets([target]);
   };
 
@@ -364,7 +362,7 @@
     if (targetIndex === -1)
       throw new Error('Already unbound');
 
-    if (targetSelf.type === 'prop' && targetSelf.dirty)
+    if (targetSelf.constructor === CircuitProp && targetSelf.dirty)
       target();
 
     var sourceIndex = lastIndexOf(targetSelf.sources, source);
