@@ -56,7 +56,7 @@
       this.cache = initialValue;
       this.value = identity;
     } else {
-      // this.cache is undefined until initial value setting
+      this.cache = initialValue();
       this.value = initialValue;
     }
 

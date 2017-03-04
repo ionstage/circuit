@@ -128,7 +128,8 @@ describe('.bind', function() {
     var b = circuit.prop(f);
     circuit.bind(a, b);
     a(2);
-    assert(!f.called);
+    a(3);
+    assert(f.calledOnce);
   });
 
   it('should update binding prop when the call stack has cleared', function(done) {
@@ -154,6 +155,15 @@ describe('.bind', function() {
     assert.equal(b(), o);
   });
 
+  it('should initialize prop value with setting function as argument', function() {
+    var f = sinon.spy(function() {
+      return 0;
+    });
+    var a = circuit.prop(f);
+    assert.equal(a(), 0);
+    assert(f.calledOnce);
+  });
+
   it('bind prop more than once', function() {
     var a = circuit.prop(0);
     var b = circuit.prop(1);
@@ -168,13 +178,12 @@ describe('.bind', function() {
 
   it('bind same prop more than once', function() {
     var a = circuit.prop(1);
-    var b = circuit.prop(function(x, y) {
-      assert.equal(x, 1);
-      assert.equal(y, 1);
-    });
+    var f = sinon.spy();
+    var b = circuit.prop(f);
     circuit.bind(a, b);
     circuit.bind(a, b);
     b();
+    assert(f.secondCall.calledWith(1, 1));
   });
 
   it('update prop values at the same time', function() {
@@ -185,8 +194,11 @@ describe('.bind', function() {
     circuit.bind(a, c);
     circuit.bind(b, c);
     a(2);
+    a(3);
+    b(2);
+    b(3);
     c();
-    assert(f.calledOnce);
+    assert(f.calledTwice);
   });
 
   it('bind prop each other', function() {
