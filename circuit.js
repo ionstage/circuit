@@ -131,13 +131,15 @@
         return;
 
       timer = setTimeout(function() {
-        for (var i = 0, len = dirtyTargets.length; i < len; i++) {
-          var target = dirtyTargets[i];
+        var updateTargets = dirtyTargets.slice();
+        dirtyTargets = [];
+
+        for (var i = 0, len = updateTargets.length; i < len; i++) {
+          var target = updateTargets[i];
           if (target._self.dirty)
             target();
         }
 
-        dirtyTargets = [];
         timer = null;
       }, 0);
     };

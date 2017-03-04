@@ -212,6 +212,24 @@ describe('.bind', function() {
     assert.equal(b(), 2);
   });
 
+  it('bind prop each other and another', function(done) {
+    var a = circuit.prop();
+    var b = circuit.prop();
+    var f = sinon.spy();
+    var c = circuit.prop(f);
+    circuit.bind(a, c);
+    circuit.bind(b, a);
+    circuit.bind(a, b);
+    a(1);
+    setTimeout(function() {
+      b(2);
+      setTimeout(function() {
+        assert(f.callCount >= 3);
+        done();
+      }, 0);
+    }, 0);
+  });
+
   it('bind prop in circle chain', function() {
     var a = circuit.prop(0);
     var b = circuit.prop(1);
