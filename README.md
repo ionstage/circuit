@@ -150,7 +150,7 @@ for (var i = 0; i < 10000; i++) {
   a(i);
 }
 
-b(); // output "b is called" only once
+b(); // output "b is called" only twice
 ```
 
 Multiple bind for prop function
