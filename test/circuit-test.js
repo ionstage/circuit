@@ -131,7 +131,7 @@ describe('.bind', function() {
     assert(!f.called);
   });
 
-  it('shoud update binding prop when the call stack has cleared', function(done) {
+  it('should update binding prop when the call stack has cleared', function(done) {
     var a = circuit.prop(1);
     var f = sinon.spy();
     var b = circuit.prop(f);
