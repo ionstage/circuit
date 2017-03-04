@@ -213,7 +213,7 @@ describe('.bind', function() {
     assert.equal(c(), 1);
   });
 
-  it('update target prop value in circle chain', function() {
+  it('should update target prop value in circle chain', function() {
     var a = circuit.prop();
     var b = circuit.prop();
     circuit.bind(a, b);
