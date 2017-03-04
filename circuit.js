@@ -213,8 +213,10 @@
     sourceSelf.targets.push(target);
     targetSelf.sources.push(source);
 
-    if (sourceSelf.constructor === CircuitProp)
+    if (sourceSelf.constructor === CircuitProp) {
       CircuitProp.markDirtyTargets([target]);
+      source();
+    }
   };
 
   circuit.unbind = function(source, target) {
