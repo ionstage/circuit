@@ -121,7 +121,7 @@
 
         targetSelf.dirty = true;
 
-        if(lastIndexOf(dirtyTargets, target) === -1)
+        if (lastIndexOf(dirtyTargets, target) === -1)
           dirtyTargets.push(target);
 
         CircuitProp.markDirtyTargets(targetSelf.targets);
