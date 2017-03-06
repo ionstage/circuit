@@ -118,8 +118,8 @@ describe('.bind', function() {
       setTimeout(function() {
         assert.equal(a(), 4);
         done();
-      });
-    });
+      }, 0);
+    }, 0);
   });
 
   it('should not update binding prop immediately', function() {
