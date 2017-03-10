@@ -163,6 +163,25 @@ describe('.bind', function() {
     assert(f.calledOnce);
   });
 
+  it('should update target prop value with setting function as argument', function(done) {
+    var a = circuit.prop();
+    var b = circuit.prop(function(x) {
+      c(x);
+    });
+    var c = circuit.prop();
+    var f = sinon.spy();
+    var d = circuit.prop(f);
+    circuit.bind(a, b);
+    circuit.bind(c, d);
+    setTimeout(function() {
+      a(1);
+      setTimeout(function() {
+        assert(f.calledWith(1));
+        done();
+      }, 0);
+    }, 0);
+  });
+
   it('bind prop more than once', function() {
     var a = circuit.prop(0);
     var b = circuit.prop(1);

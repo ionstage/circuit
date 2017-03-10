@@ -135,7 +135,7 @@
       if (timer !== null)
         return;
 
-      timer = setTimeout(function() {
+      timer = setTimeout(function updateDirtyTargets() {
         var updateTargets = dirtyTargets.slice();
         dirtyTargets = [];
 
@@ -144,6 +144,9 @@
           if (target._self.dirty)
             target();
         }
+
+        if (dirtyTargets.length !== 0)
+          updateDirtyTargets();
 
         timer = null;
       }, 0);
