@@ -128,8 +128,7 @@ describe('.bind', function() {
     var b = circuit.prop(f);
     circuit.bind(a, b);
     a(2);
-    a(3);
-    assert(f.calledOnce);
+    assert(!f.called);
   });
 
   it('should update binding prop when the call stack has cleared', function(done) {
@@ -183,7 +182,7 @@ describe('.bind', function() {
     circuit.bind(a, b);
     circuit.bind(a, b);
     b();
-    assert(f.secondCall.calledWith(1, 1));
+    assert(f.calledWith(1, 1));
   });
 
   it('update prop values at the same time', function() {
@@ -194,11 +193,9 @@ describe('.bind', function() {
     circuit.bind(a, c);
     circuit.bind(b, c);
     a(2);
-    a(3);
     b(2);
-    b(3);
     c();
-    assert(f.calledTwice);
+    assert(f.calledOnce);
   });
 
   it('bind prop each other', function() {
@@ -224,7 +221,7 @@ describe('.bind', function() {
     setTimeout(function() {
       b(2);
       setTimeout(function() {
-        assert(f.callCount >= 3);
+        assert(f.calledTwice);
         done();
       }, 0);
     }, 0);

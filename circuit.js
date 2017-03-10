@@ -55,13 +55,18 @@
     if (typeof initialValue !== 'function') {
       this.cache = initialValue;
       this.value = identity;
+      this.dirty = false;
+      this.timer = null;
     } else {
-      this.cache = initialValue();
+      // this.cache is unset until first update
       this.value = initialValue;
+      this.dirty = true;
+      this.timer = setTimeout(function() {
+        self.timer = null;
+        self.dirty = true;
+        self.update();
+      }, 0);
     }
-
-    this.dirty = false;
-    this.timer = null;
 
     return func;
   };
