@@ -159,6 +159,9 @@
     var func = function(context) {
       var canceled = false;
 
+      if (typeof context === 'undefined')
+        context = null;
+
       var contextProp = function(value) {
         if (typeof value === 'undefined')
           return context;

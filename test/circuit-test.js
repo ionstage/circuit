@@ -326,6 +326,13 @@ describe('.bind', function() {
     a(1);
   });
 
+  it('default value of event context is null', function() {
+    var a = circuit.event(function(event) {
+      assert.strictEqual(event.context(), null);
+    });
+    a();
+  });
+
   it('assignment to event context', function(done) {
     var a = circuit.event(function(event) {
       event.context = 1;
