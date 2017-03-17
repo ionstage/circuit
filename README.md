@@ -3,7 +3,7 @@
 Data binding library
 
 ```js
-var i = circuit.prop(0);
+var i = circuit.prop(1);
 var square = circuit.prop(function(x) {
   return x * x;
 });
@@ -19,6 +19,9 @@ setInterval(function() {
   console.log(square());
   pulse();
 }, 1000);
+
+// output a square number every second
+// 1, 4, 9, 16, 25, 36, 49...
 ```
 
 ## Features
