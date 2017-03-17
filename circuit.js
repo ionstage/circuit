@@ -6,6 +6,7 @@
 
 (function(global) {
   'use strict';
+
   var lastIndexOf = function(array, item) {
     for (var i = array.length - 1; i >= 0; i--) {
       if (array[i] === item)
