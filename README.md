@@ -54,7 +54,7 @@ var circuit = require('circuit');
 
 ## API
 
-### data
+### data()
 
 Return a getter/setter function that stores arbitrary data
 
@@ -93,7 +93,7 @@ message('Bob');
 var b = message(); // b == "Hello, Bob"
 ```
 
-### event
+### event()
 
 Return a function for event transmission
 
@@ -121,7 +121,7 @@ var hello = circuit.event(function(event) {
 hello(text); // output: "Hello, World!"
 ```
 
-### bind
+### bind()
 
 Bind arguments of data function (data synchronization)
 
@@ -252,7 +252,7 @@ a(1);
 // event 'b' will be called and output `2`
 ```
 
-### unbind
+### unbind()
 
 Cancel binding of data/event functions
 
