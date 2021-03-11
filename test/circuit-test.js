@@ -6,9 +6,9 @@ describe('.prop', function() {
   it('getter/setter', function() {
     var o = {};
     var a = circuit.prop(null);
-    assert.equal(a(), null);
+    assert.strictEqual(a(), null);
     a(o);
-    assert.equal(a(), o);
+    assert.strictEqual(a(), o);
   });
 
   it('no argument', function() {
@@ -50,10 +50,10 @@ describe('.bind', function() {
     circuit.bind(a, b);
     circuit.bind(b, c);
     circuit.bind(c, d);
-    assert.equal(d(), o0);
+    assert.strictEqual(d(), o0);
     var o1 = {};
     a(o1);
-    assert.equal(d(), o1);
+    assert.strictEqual(d(), o1);
   });
 
   it('event', function(done) {
@@ -103,7 +103,7 @@ describe('.bind', function() {
     var a = circuit.prop(0);
     circuit.bind(a, a);
     a(1);
-    assert.equal(a(), 1);
+    assert.strictEqual(a(), 1);
   });
 
   it('bind same prop with function', function(done) {
@@ -112,11 +112,11 @@ describe('.bind', function() {
     });
     circuit.bind(a, a);
     a(1);
-    assert.equal(a(), 2);
+    assert.strictEqual(a(), 2);
     setTimeout(function() {
-      assert.equal(a(), 3);
+      assert.strictEqual(a(), 3);
       setTimeout(function() {
-        assert.equal(a(), 4);
+        assert.strictEqual(a(), 4);
         done();
       }, 0);
     }, 0);
@@ -151,7 +151,7 @@ describe('.bind', function() {
     circuit.bind(a, b);
     var o = {};
     a(o);
-    assert.equal(b(), o);
+    assert.strictEqual(b(), o);
   });
 
   it('should initialize prop value with setting function as argument', function() {
@@ -159,7 +159,7 @@ describe('.bind', function() {
       return 0;
     });
     var a = circuit.prop(f);
-    assert.equal(a(), 0);
+    assert.strictEqual(a(), 0);
     assert(f.calledOnce);
   });
 
@@ -191,7 +191,7 @@ describe('.bind', function() {
     circuit.bind(a, c);
     circuit.bind(b, c);
     a(1);
-    assert.equal(c(), 2);
+    assert.strictEqual(c(), 2);
   });
 
   it('bind same prop more than once', function() {
@@ -223,9 +223,9 @@ describe('.bind', function() {
     circuit.bind(a, b);
     circuit.bind(b, a);
     b(1);
-    assert.equal(a(), 1);
+    assert.strictEqual(a(), 1);
     a(2);
-    assert.equal(b(), 2);
+    assert.strictEqual(b(), 2);
   });
 
   it('bind prop each other and another', function(done) {
@@ -254,9 +254,9 @@ describe('.bind', function() {
     circuit.bind(b, c);
     circuit.bind(c, a);
     a(1);
-    assert.equal(a(), 1);
-    assert.equal(b(), 1);
-    assert.equal(c(), 1);
+    assert.strictEqual(a(), 1);
+    assert.strictEqual(b(), 1);
+    assert.strictEqual(c(), 1);
   });
 
   it('should update target prop value in circle chain', function() {
@@ -265,7 +265,7 @@ describe('.bind', function() {
     circuit.bind(a, b);
     b(0);
     circuit.bind(b, a);
-    assert.equal(a(), 0);
+    assert.strictEqual(a(), 0);
   });
 
   it('cancel event', function(done) {
@@ -305,7 +305,7 @@ describe('.bind', function() {
     });
     var b = circuit.event(function(event) {
       var value = event.context();
-      assert.equal(value, 1);
+      assert.strictEqual(value, 1);
       done();
     });
     circuit.bind(a, b);
@@ -315,11 +315,11 @@ describe('.bind', function() {
   it('event context', function(done) {
     var a = circuit.event(function(event) {
       var context = event.context;
-      assert.equal(context(), 1);
+      assert.strictEqual(context(), 1);
       context(context() + 1);
     });
     var b = circuit.event(function(event) {
-      assert.equal(event.context(), 2);
+      assert.strictEqual(event.context(), 2);
       done();
     });
     circuit.bind(a, b);
@@ -356,7 +356,7 @@ describe('unbind', function() {
     circuit.unbind(a, b);
     var o = {};
     a(o);
-    assert.notEqual(b(), o);
+    assert.notStrictEqual(b(), o);
   });
 
   it('event', function(done) {
@@ -394,6 +394,6 @@ describe('unbind', function() {
     circuit.bind(a, b);
     a(1);
     circuit.unbind(a, b);
-    assert.equal(b(), 1);
+    assert.strictEqual(b(), 1);
   });
 });
