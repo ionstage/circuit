@@ -3,8 +3,8 @@
 Data binding library
 
 ```js
-var i = circuit.prop(1);
-var square = circuit.prop(function(x) {
+var i = circuit.data(1);
+var square = circuit.data(function(x) {
   return x * x;
 });
 circuit.bind(i, square);
@@ -54,13 +54,13 @@ var circuit = require('circuit');
 
 ## API
 
-### prop
+### data
 
 Return a getter/setter function that stores arbitrary data
 
 ```js
 // create a getter-setter with initial value `foo`
-var text = circuit.prop('foo');
+var text = circuit.data('foo');
 
 // get the value
 var a = text(); // a == "foo"
@@ -76,7 +76,7 @@ Set a function for data transformation
 
 ```js
 // create a getter-setter with the function
-var message = circuit.prop(function(name) {
+var message = circuit.data(function(name) {
   return 'Hello, ' + name;
 });
 
@@ -123,13 +123,13 @@ hello(text); // output: "Hello, World!"
 
 ### bind
 
-Bind arguments of prop function (data synchronization)
+Bind arguments of data function (data synchronization)
 
 ```js
-var a = circuit.prop(0);
-var b = circuit.prop(0);
+var a = circuit.data(0);
+var b = circuit.data(0);
 
-// bind prop 'a' to prop 'b'
+// bind data 'a' to data 'b'
 circuit.bind(a, b);
 
 // change value of 'a'
@@ -141,8 +141,8 @@ console.log(b()); // output: 1
 Support lazy evaluation
 
 ```js
-var a = circuit.prop(0);
-var b = circuit.prop(function(value) {
+var a = circuit.data(0);
+var b = circuit.data(function(value) {
   console.log('b is called');
   return value;
 });
@@ -156,12 +156,12 @@ for (var i = 0; i < 10000; i++) {
 b(); // output "b is called" only twice
 ```
 
-Multiple bind for prop function
+Multiple bind for data function
 
 ```js
-var a = circuit.prop(0);
-var b = circuit.prop(0);
-var sum = circuit.prop(function(x, y) {
+var a = circuit.data(0);
+var b = circuit.data(0);
+var sum = circuit.data(function(x, y) {
   return x + y;
 });
 
@@ -254,14 +254,14 @@ a(1);
 
 ### unbind
 
-Cancel binding of prop/event functions
+Cancel binding of data/event functions
 
 ```js
-var a = circuit.prop(0);
-var b = circuit.prop(0);
+var a = circuit.data(0);
+var b = circuit.data(0);
 circuit.bind(a, b);
 
-// prop 'a' and prop 'b' are unbound
+// data 'a' and data 'b' are unbound
 circuit.unbind(a, b);
 
 a(1);
@@ -273,22 +273,22 @@ console.log(b()); // output: 0
 
 ```js
 var Foo = function() {
-  this.i = circuit.prop(0);
+  this.i = circuit.data(0);
   this.countUp = circuit.event(function() {
     this.i(this.i() + 1);
   }.bind(this));
 };
 
 var Bar = function() {
-  this.x = circuit.prop(0);
-  this['x ^ 2'] = circuit.prop(function(x) {
+  this.x = circuit.data(0);
+  this['x ^ 2'] = circuit.data(function(x) {
     return x * x;
   });
   circuit.bind(this.x, this['x ^ 2']);
 };
 
 var Baz = function() {
-  this.print = circuit.prop(function(value) {
+  this.print = circuit.data(function(value) {
     console.log(value);
   });
 };

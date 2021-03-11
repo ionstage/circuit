@@ -30,7 +30,7 @@
 
   var circuit = {};
 
-  var CircuitProp = function(initialValue) {
+  var CircuitData = function(initialValue) {
     var self = this;
 
     var func = function() {
@@ -72,7 +72,7 @@
     return func;
   };
 
-  CircuitProp.prototype.update = function() {
+  CircuitData.prototype.update = function() {
     if (!this.dirty)
       return;
 
@@ -90,13 +90,13 @@
     this.markDirty();
   };
 
-  CircuitProp.prototype.updateCache = function(value) {
+  CircuitData.prototype.updateCache = function(value) {
     this.cache = value;
     this.dirty = false;
   };
 
-  CircuitProp.prototype.markDirty = function() {
-    CircuitProp.markDirtyTargets(this.targets);
+  CircuitData.prototype.markDirty = function() {
+    CircuitData.markDirtyTargets(this.targets);
 
     if (!this.dirty)
       return;
@@ -113,7 +113,7 @@
     }
   };
 
-  CircuitProp.markDirtyTargets = (function() {
+  CircuitData.markDirtyTargets = (function() {
     var dirtyTargets = [];
     var timer = null;
 
@@ -130,7 +130,7 @@
         if (lastIndexOf(dirtyTargets, target) === -1)
           dirtyTargets.push(target);
 
-        CircuitProp.markDirtyTargets(targetSelf.targets);
+        CircuitData.markDirtyTargets(targetSelf.targets);
       }
 
       if (timer !== null)
@@ -163,7 +163,7 @@
       if (typeof context === 'undefined')
         context = null;
 
-      var contextProp = function(value) {
+      var contextData = function(value) {
         if (typeof value === 'undefined')
           return context;
         context = value;
@@ -174,9 +174,9 @@
           canceled = true;
         },
         dispatch: function() {
-          self.dispatch(contextProp());
+          self.dispatch(contextData());
         },
-        context: contextProp
+        context: contextData
       };
 
       if (typeof listener === 'function')
@@ -185,7 +185,7 @@
       if (canceled)
         return;
 
-      self.dispatch(contextProp());
+      self.dispatch(contextData());
     };
 
     func._self = self;
@@ -206,9 +206,12 @@
     }, 0);
   };
 
-  circuit.prop = function(initialValue) {
-    return new CircuitProp(initialValue);
+  circuit.data = function(initialValue) {
+    return new CircuitData(initialValue);
   };
+
+  // alias for backward compatibility
+  circuit.prop = circuit.data;
 
   circuit.event = function(listener) {
     return new CircuitEvent(listener);
@@ -222,13 +225,13 @@
     var targetSelf = target._self;
 
     if (sourceSelf.constructor !== targetSelf.constructor)
-      throw new TypeError('Cannot bind prop and event');
+      throw new TypeError('Cannot bind data and event');
 
     sourceSelf.targets.push(target);
     targetSelf.sources.push(source);
 
-    if (sourceSelf.constructor === CircuitProp) {
-      CircuitProp.markDirtyTargets([target]);
+    if (sourceSelf.constructor === CircuitData) {
+      CircuitData.markDirtyTargets([target]);
       source();
     }
   };
@@ -245,7 +248,7 @@
     if (targetIndex === -1)
       throw new Error('Already unbound');
 
-    if (targetSelf.constructor === CircuitProp && targetSelf.dirty)
+    if (targetSelf.constructor === CircuitData && targetSelf.dirty)
       target();
 
     var sourceIndex = lastIndexOf(targetSelf.sources, source);
