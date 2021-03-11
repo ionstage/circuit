@@ -98,11 +98,9 @@ var b = message(); // b == "Hello, Bob"
 Return a function for event transmission
 
 ```js
-var text = 'Hello, world!';
-
 // create a event function
 var hello = circuit.event(function() {
-  console.log(text);
+  console.log('Hello, world!');
 });
 
 // call event
