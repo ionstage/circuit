@@ -2,22 +2,32 @@
 
 Data binding library
 
-```js
-var i = circuit.data(1);
-var square = circuit.data(function(x) {
-  return x * x;
-});
-circuit.bind(i, square);
+[Demo](https://jsfiddle.net/9az08yve/)
 
-var pulse = circuit.event();
-var countUp = circuit.event(function() {
-  i(i() + 1);
-});
-circuit.bind(pulse, countUp);
+```js
+var Square = function() {
+  this.width = circuit.data(1);
+  this.area = circuit.data(function(x) {
+    return x * x;
+  });
+  circuit.bind(this.width, this.area);
+};
+
+var Counter = function() {
+  this.count = circuit.data(1);
+  this.up = circuit.event(function() {
+    this.count(this.count() + 1);
+  }.bind(this));
+};
+
+var square = new Square();
+var counter = new Counter();
+
+circuit.bind(counter.count, square.width);
 
 setInterval(function() {
-  console.log(square());
-  pulse();
+  console.log(square.area());
+  counter.up();
 }, 1000);
 
 // output a square number every second
@@ -98,16 +108,16 @@ var b = message(); // b == "Hello, Bob"
 Return a function for event transmission
 
 ```js
-// create a event function
+// create event function
 var hello = circuit.event(function() {
   console.log('Hello, world!');
 });
 
-// call event
+// call event function
 hello(); // output: "Hello, World!"
 ```
 
-Get an argument of a function as event context (event.context())
+Get an argument of a function as event context (use event.context())
 
 ```js
 var text = 'Hello, world!';
@@ -125,24 +135,36 @@ Bind arguments of data function (data synchronization)
 
 ```js
 var a = circuit.data(0);
-var b = circuit.data(0);
+
+var b = circuit.data(function(x) {
+  return x + 1;
+});
+
+var c = circuit.data(function(x) {
+  return x * x;
+});
 
 // bind data 'a' to data 'b'
 circuit.bind(a, b);
 
-// change value of 'a'
+// bind data 'b' to data 'c'
+circuit.bind(b, c);
+
+// change the value of 'a'
 a(1);
 
-console.log(b()); // output: 1
+console.log(b()); // output: 2
+console.log(c()); // output: 4
 ```
 
 Support lazy evaluation
 
 ```js
 var a = circuit.data(0);
-var b = circuit.data(function(value) {
+
+var b = circuit.data(function(x) {
   console.log('b is called');
-  return value;
+  return x;
 });
 
 circuit.bind(a, b);
@@ -154,53 +176,71 @@ for (var i = 0; i < 10000; i++) {
 b(); // output "b is called" only twice
 ```
 
-Multiple bind for data function
+Multiple binding for data function
 
 ```js
 var a = circuit.data(0);
+
 var b = circuit.data(0);
+
 var sum = circuit.data(function(x, y) {
   return x + y;
 });
 
-// bind value of 'a' to argument 'x' of sum()
+// bind the value of 'a' to argument 'x' of sum()
 circuit.bind(a, sum);
 
-// bind value of 'b' to argument 'y' of sum()
+// bind the value of 'b' to argument 'y' of sum()
 circuit.bind(b, sum);
 
 a(2);
 b(3);
 
 console.log(sum()); // output: 5
+
+b(5);
+
+console.log(sum()); // output: 7
 ```
 
-Create event chain
+Create event chaining
 
 ```js
 var a = circuit.event();
+
 var b = circuit.event(function() {
-  console.log('Hello, world!');
+  console.log('b is called');
+});
+
+var c = circuit.event(function() {
+  console.log('c is called');
 });
 
 // bind event 'a' to event 'b'
 circuit.bind(a, b);
 
+// bind event 'b' to event 'c'
+circuit.bind(b, c);
+
 // call event 'a'
 a();
 
-// event 'b' will be called and output "Hello, world!"
+// event 'b' will be called and output "b is called"
+// event 'c' will be called and output "c is called"
 ```
 
-Cancel event propagation (event.cancel())
+Cancel event propagation (use event.cancel())
 
 ```js
 var a = circuit.event();
+
 var b = circuit.event(function(event) {
   event.cancel();
+  console.log('b is called');
 });
+
 var c = circuit.event(function() {
-  console.log('Hello, world!');
+  console.log('c is called');
 });
 
 circuit.bind(a, b);
@@ -211,18 +251,21 @@ a();
 // event 'b' will be called but event 'c' will not be called
 ```
 
-Dispatch event later (event.dispatch())
+Dispatch event later (use event.dispatch())
 
 ```js
 var a = circuit.event();
+
 var b = circuit.event(function(event) {
   event.cancel();
+  console.log('b is called');
   setTimeout(function() {
     event.dispatch();
   }, 1000);
 });
+
 var c = circuit.event(function() {
-  console.log('Hello, world!');
+  console.log('c is called');
 });
 
 circuit.bind(a, b);
@@ -230,101 +273,55 @@ circuit.bind(b, c);
 
 a();
 
-// event 'c' will be called 1 second after
+// event 'b' will be called and event 'c' will be called 1 second after
 ```
 
-Relay event context
+Relay context of event function one after another
 
 ```js
 var a = circuit.event(function(event) {
   var context = event.context;
   context(context() + 1);
 });
+
 var b = circuit.event(function(event) {
+	var context = event.context;
+  console.log(context());
+  context(context() * context());
+});
+
+var c = circuit.event(function(event) {
   console.log(event.context());
 });
 
 circuit.bind(a, b);
+circuit.bind(b, c);
+
 a(1);
 
-// event 'b' will be called and output `2`
+// event 'b' will be called and output "2"
+// event 'c' will be called and output "4"
 ```
 
 ### circuit.unbind()
 
-Cancel binding of data/event functions
+Remove binding of data/event functions
 
 ```js
 var a = circuit.data(0);
+
 var b = circuit.data(0);
+
 circuit.bind(a, b);
+
+a(1);
 
 // data 'a' and data 'b' are unbound
 circuit.unbind(a, b);
 
-a(1);
+a(2);
 
-console.log(b()); // output: 0
-```
-
-## Code example
-
-```js
-var Foo = function() {
-  this.i = circuit.data(0);
-  this.countUp = circuit.event(function() {
-    this.i(this.i() + 1);
-  }.bind(this));
-};
-
-var Bar = function() {
-  this.x = circuit.data(0);
-  this['x ^ 2'] = circuit.data(function(x) {
-    return x * x;
-  });
-  circuit.bind(this.x, this['x ^ 2']);
-};
-
-var Baz = function() {
-  this.print = circuit.data(function(value) {
-    console.log(value);
-  });
-};
-
-var Qux = function() {
-  this.clock = circuit.event(function(event) {
-    event.cancel();
-    setInterval(function() {
-      event.dispatch();
-    }, 1000);
-  });
-};
-
-var foo = new Foo();
-var bar = new Bar();
-var baz = new Baz();
-var qux = new Qux();
-
-var main = {
-  start: circuit.event()
-};
-
-circuit.bind(foo.i, bar.x);
-circuit.bind(bar['x ^ 2'], baz.print);
-circuit.bind(qux.clock, foo.countUp);
-circuit.bind(main.start, qux.clock);
-
-main.start();
-
-setTimeout(function() {
-  circuit.unbind(qux.clock, foo.countUp);
-  console.log('stop counting...');
-
-  setTimeout(function() {
-    console.log('restart counting');
-    circuit.bind(qux.clock, foo.countUp);
-  }, 5000);
-}, 10000);
+console.log(b()); // output: 1
 ```
 
 ## Running tests
@@ -348,4 +345,4 @@ npm test
 Copyright &copy; 2015 iOnStage
 Licensed under the [MIT License][mit].
 
-[MIT]: http://www.opensource.org/licenses/mit-license.php
+[MIT]: https://opensource.org/licenses/mit-license.php
