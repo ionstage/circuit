@@ -285,7 +285,7 @@ var a = circuit.event(function(event) {
 });
 
 var b = circuit.event(function(event) {
-	var context = event.context;
+  var context = event.context;
   console.log(context());
   context(context() * context());
 });
